@@ -517,6 +517,12 @@ tr:hover td{background:var(--paper)}
 
 <script>
 // ═══════════════════════════════════════════════════════════
+// DATA FIXADA — sistema opera como se hoje fosse 20/04/2026
+// ═══════════════════════════════════════════════════════════
+const TODAY_STR='2026-04-20';
+const TODAY_DATE=new Date('2026-04-20T12:00:00');
+
+// ═══════════════════════════════════════════════════════════
 // SEEDS & CONSTANTS
 // ═══════════════════════════════════════════════════════════
 const MONTHS_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -828,7 +834,7 @@ function renderDashboard(md){
   const dias={};md.forEach(r=>{dias[r.DATA]=(dias[r.DATA]||0)+1;});
   const dList=Object.entries(dias).sort((a,b)=>a[0]<b[0]?-1:1);
   const dMax=Math.max(...dList.map(d=>d[1]),1);
-  const todayStr=new Date().toISOString().slice(0,10);
+  const todayStr=TODAY_STR;
   document.getElementById('chart-dias').innerHTML=dList.length?
     `<div class="bar-chart">${dList.map(([d,n])=>{const h=Math.round(n/dMax*70);const isT=d===todayStr;
     return`<div class="bday"><span class="bv">${n}</span><div class="bb" style="height:${h}px;background:${isT?'#1a3f6b':'#1a5c3a'};opacity:${isT?1:.8}"></div><span class="bd">${d.slice(8)}</span></div>`;}).join('')}</div>`
@@ -836,8 +842,8 @@ function renderDashboard(md){
 }
 
 function renderAcomp(md){
-  const todayStr=new Date().toISOString().slice(0,10);
-  document.getElementById('today-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  const todayStr=TODAY_STR;
+  document.getElementById('today-date').textContent=TODAY_DATE.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
   document.getElementById('mes-lbl').textContent=monthLabel(curYear,curMonth);
   document.getElementById('breakdown-pill').textContent=monthLabel(curYear,curMonth);
   // Today
@@ -1177,7 +1183,7 @@ function toggleUser(id){
 // EXPORTS
 // ═══════════════════════════════════════════════════════════
 function exportCSV(type){
-  const todayStr=new Date().toISOString().slice(0,10);
+  const todayStr=TODAY_STR;
   const data=type==='day'?allData.filter(r=>r.DATA===todayStr):monthData(curYear,curMonth);
   if(!data.length){toast('Sem dados para exportar.','error');return;}
   const header=['DATA','ATENDENTE','NOME','PLANO','CARTEIRINHA','PROCEDIMENTO','TEM_SADT','TELEFONE','ORIGEM','REGISTRADO_POR'];
@@ -1189,9 +1195,9 @@ function exportCSV(type){
   addLog('Export CSV',`${type} / ${data.length} registros`);toast('CSV exportado!','success');
 }
 function exportPDF(type){
-  const todayStr=new Date().toISOString().slice(0,10);
+  const todayStr=TODAY_STR;
   const data=type==='day'?allData.filter(r=>r.DATA===todayStr):monthData(curYear,curMonth);
-  const title=type==='day'?`Relatório Diário — ${new Date().toLocaleDateString('pt-BR')}`:`Relatório Mensal — ${monthLabel(curYear,curMonth)}`;
+  const title=type==='day'?`Relatório Diário — ${TODAY_DATE.toLocaleDateString('pt-BR')}`:`Relatório Mensal — ${monthLabel(curYear,curMonth)}`;
   if(!data.length){toast('Sem dados para exportar.','error');return;}
   const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   doc.setFillColor(15,14,12);doc.rect(0,0,297,18,'F');
@@ -1253,7 +1259,7 @@ try{
   }
   keysToRemove.forEach(k=>localStorage.removeItem(k));
 }catch(e){}
-document.getElementById('f-data').value=new Date().toISOString().slice(0,10);
+document.getElementById('f-data').value=TODAY_STR;
 loadAll();
 </script>
 </body>

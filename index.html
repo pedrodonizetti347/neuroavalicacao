@@ -1063,11 +1063,14 @@ function saveRecord(){
     TEM_SADT:document.getElementById('f-sadt').value,TELEFONE:document.getElementById('f-tel').value,
     ORIGEM:document.getElementById('f-orig').value,_addedBy:curUser?.name||'?',_addedAt:new Date().toLocaleString('pt-BR')};
   const[y,m]=date.split('-').map(Number);curYear=y;curMonth=m-1;viewYear=y;
+  const btnSalvar=document.querySelector('button[onclick="saveRecord()"]');
+  if(btnSalvar){btnSalvar.disabled=true;btnSalvar.textContent='Salvando...';}
   allData.push(rec);addLog('Novo registro',`${nome} / ${plano} / ${date}`);saveAll();
   sendToSheets(rec);
   buildMonthChips();renderAll();
   document.getElementById('f-nome').value='';document.getElementById('f-cart').value='';document.getElementById('f-tel').value='';
   toast('Ligação salva!','success');showView('acompanhamento');
+  setTimeout(()=>{if(btnSalvar){btnSalvar.disabled=false;btnSalvar.textContent='Salvar ligação';}},3000);
 }
 
 // ═══════════════════════════════════════════════════════════

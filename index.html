@@ -553,6 +553,7 @@ function isPart(r){return r.PLANO==='Particular';}
 function loadAll(){
   // Data
   try{const r=localStorage.getItem(SK_DATA);if(r)allData=JSON.parse(r);}catch(e){allData=[];}
+  allData=allData.filter(r=>r.DATA&&/^\d{4}-\d{2}-\d{2}$/.test(r.DATA));
   // Merge seed data: adiciona apenas registros do seed que ainda não existem no localStorage
   // (comparando por NOME + DATA + CARTEIRINHA), preservando lançamentos manuais novos
   function mergeSeed(seed){
@@ -1041,9 +1042,13 @@ function syncFromSheets(){
       if(!Array.isArray(rows)||!rows.length)return;
       rows.forEach(r=>{
         if(!r.DATA||!r.NOME)return;
+        // Ignora datas inválidas (ex: formato ISO com T e Z)
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(r.DATA))return;
         const jaExiste=allData.some(x=>x.DATA===r.DATA&&x.NOME===r.NOME&&(x.CARTEIRINHA||'')===(r.CARTEIRINHA||''));
         if(!jaExiste)allData.push(r);
       });
+      // Remove registros com data inválida do allData
+      allData=allData.filter(r=>r.DATA&&/^\d{4}-\d{2}-\d{2}$/.test(r.DATA));
       saveAll();buildMonthChips();renderAll();
     })
     .catch(()=>{});
@@ -1058,7 +1063,10 @@ function sendToSheets(rec){
 // ═══════════════════════════════════════════════════════════
 function saveRecord(){
   const date=document.getElementById('f-data').value,nome=document.getElementById('f-nome').value.trim(),plano=document.getElementById('f-plano').value;
-  if(!date||!nome||!plano){toast('Preencha data, nome e plano.','error');return;}
+  const cart=document.getElementById('f-cart').value.trim();
+  const planoVal=document.getElementById('f-plano').value;
+  if(!date||!nome||!planoVal){toast('Preencha data, nome e plano.','error');return;}
+  if(!cart&&planoVal!=='Particular'){toast('Preencha a carteirinha do paciente.','error');return;}
   const rec={DATA:date,ATENDENTE:document.getElementById('f-at').value,NOME:nome.toUpperCase(),PLANO:plano,
     CARTEIRINHA:document.getElementById('f-cart').value,PROCEDIMENTO:document.getElementById('f-proc').value||'1ª CONSULTA',
     TEM_SADT:document.getElementById('f-sadt').value,TELEFONE:document.getElementById('f-tel').value,

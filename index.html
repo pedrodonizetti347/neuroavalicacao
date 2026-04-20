@@ -1214,6 +1214,42 @@ try{
 }catch(e){}
 document.getElementById('f-data').value=new Date().toISOString().slice(0,10);
 loadAll();
+  <script>
+
+function doLogin(){
+  const email = document.getElementById('1-email').value.trim().toLowerCase();
+  const pwd = document.getElementById('1-senha').value;
+
+  if(!email || !pwd){
+    alert("Preencha email e senha");
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+  console.log("USERS:", users);
+  console.log("EMAIL:", email);
+
+  const u = users.find(x =>
+    x.email && x.email.trim().toLowerCase() === email
+  );
+
+  if(!u){
+    alert("Email não encontrado");
+    return;
+  }
+
+  if(btoa(pwd) !== u.pwdHash){
+    alert("Senha incorreta");
+    return;
+  }
+
+  alert("Login OK");
+}
+
+loadAll();
+
+</script>
 </script>
 </body>
 </html>

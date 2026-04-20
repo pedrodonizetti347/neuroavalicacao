@@ -578,12 +578,12 @@ function saveAll(){
 function defaultUsers(){
   return [
     {id:'admin',name:'Administrador',email:ADMIN_EMAIL,role:'Admin',color:'#1a5c3a',pwdHash:ADMIN_PWD_HASH,firstAccess:false,active:true},
-    {id:'milleny',name:'Milleny',email:'',role:'Atendente',color:'#1a5c3a',pwdHash:'',firstAccess:true,active:true},
-    {id:'giovanna',name:'Giovanna',email:'',role:'Atendente',color:'#1a3f6b',pwdHash:'',firstAccess:true,active:true},
-    {id:'larissa',name:'Larissa',email:'',role:'Atendente',color:'#8c2020',pwdHash:'',firstAccess:true,active:true},
-    {id:'eliana',name:'Eliana',email:'',role:'Atendente',color:'#7a4e00',pwdHash:'',firstAccess:true,active:true},
-    {id:'maria',name:'Maria',email:'',role:'Atendente',color:'#4a2472',pwdHash:'',firstAccess:true,active:true},
-    {id:'ester',name:'Ester',email:'',role:'Atendente',color:'#0f5454',pwdHash:'',firstAccess:true,active:true},
+    {id:'milleny',name:'Milleny',email:'milleny.neuroavaliacao@gmail.com',role:'Atendente',color:'#1a5c3a',pwdHash:'',firstAccess:true,active:true},
+    {id:'giovanna',name:'Giovanna',email:'giovanna.neuroavalicao2@gmail.com',role:'Atendente',color:'#1a3f6b',pwdHash:'',firstAccess:true,active:true},
+    {id:'larissa',name:'Larissa',email:'',role:'Atendente',color:'#8c2020',pwdHash:'',firstAccess:true,active:false},
+    {id:'eliana',name:'Eliana',email:'eliana08oliveira@gmail.com',role:'Atendente',color:'#7a4e00',pwdHash:'',firstAccess:true,active:true},
+    {id:'maria',name:'Maria',email:'maria.caroline.neuroavaliacao@gmail.com',role:'Atendente',color:'#4a2472',pwdHash:'',firstAccess:true,active:true},
+    {id:'ester',name:'Ester',email:'',role:'Atendente',color:'#0f5454',pwdHash:'',firstAccess:true,active:false},
   ];
 }
 function addLog(action,detail){
@@ -637,7 +637,7 @@ function setOk(id,msg){const el=document.getElementById(id);el.textContent=msg;e
 // ═══════════════════════════════════════════════════════════
 // LOGIN FLOW
 // ═══════════════════════════════════════════════════════════
-function function doLogin()
+function doLogin(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
   const pwd=document.getElementById('l-senha').value;
   if(!email||!pwd){setErr('login-err','Preencha email e senha.');return;}
@@ -646,14 +646,8 @@ function function doLogin()
     const adm={id:'admin',name:'Administrador',email:ADMIN_EMAIL,role:'Admin',color:'#1a5c3a',pwdHash:ADMIN_PWD_HASH,firstAccess:false,active:true};
     enterApp(adm);return;
   }
-  const u = users.find(x =>
-  x.email && x.email.trim().toLowerCase() === email && x.active
-);
-
-if(!u){
-  setErr('login-err','Email não encontrado ou usuário inativo.');
-  return;
-}
+  const u=users.find(x=>x.email.toLowerCase()===email&&x.active);
+  if(!u){setErr('login-err','Email nao encontrado ou usuario inativo.');return;}
   if(btoa(pwd)!==u.pwdHash){setErr('login-err','Senha incorreta. Tente novamente.');addLog('Login falhou',email);return;}
   if(u.firstAccess){
     // Force password change
@@ -1214,42 +1208,6 @@ try{
 }catch(e){}
 document.getElementById('f-data').value=new Date().toISOString().slice(0,10);
 loadAll();
-  <script>
-
-function doLogin(){
-  const email = document.getElementById('1-email').value.trim().toLowerCase();
-  const pwd = document.getElementById('1-senha').value;
-
-  if(!email || !pwd){
-    alert("Preencha email e senha");
-    return;
-  }
-
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-
-  console.log("USERS:", users);
-  console.log("EMAIL:", email);
-
-  const u = users.find(x =>
-    x.email && x.email.trim().toLowerCase() === email
-  );
-
-  if(!u){
-    alert("Email não encontrado");
-    return;
-  }
-
-  if(btoa(pwd) !== u.pwdHash){
-    alert("Senha incorreta");
-    return;
-  }
-
-  alert("Login OK");
-}
-
-loadAll();
-
-</script>
 </script>
 </body>
 </html>

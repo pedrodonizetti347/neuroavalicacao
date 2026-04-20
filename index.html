@@ -1036,22 +1036,23 @@ function goPage(d){page=Math.max(1,page+d);renderTable();}
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbwr-SF92iogoYgxNQIe5GP6BlZ043yzzJzfXAlDf__ZihqpMC-GpzICReYtI-AoaRU59A/exec';
 
 function syncFromSheets(){
-  fetch(SHEETS_URL)
+  fetch(SHEETS_URL+'?t='+Date.now())
     .then(r=>r.json())
     .then(rows=>{
       if(!Array.isArray(rows)||!rows.length)return;
+      let changed=false;
       rows.forEach(r=>{
         if(!r.DATA||!r.NOME)return;
-        // Ignora datas inválidas (ex: formato ISO com T e Z)
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(r.DATA))return;
+        const dataStr=String(r.DATA).trim();
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dataStr))return;
+        r.DATA=dataStr;
         const jaExiste=allData.some(x=>x.DATA===r.DATA&&x.NOME===r.NOME&&(x.CARTEIRINHA||'')===(r.CARTEIRINHA||''));
-        if(!jaExiste)allData.push(r);
+        if(!jaExiste){allData.push(r);changed=true;}
       });
-      // Remove registros com data inválida do allData
-      allData=allData.filter(r=>r.DATA&&/^\d{4}-\d{2}-\d{2}$/.test(r.DATA));
-      saveAll();buildMonthChips();renderAll();
+      allData=allData.filter(r=>r.DATA&&/^\d{4}-\d{2}-\d{2}$/.test(String(r.DATA).trim()));
+      if(changed){saveAll();buildMonthChips();renderAll();}
     })
-    .catch(()=>{});
+    .catch(e=>console.log('Sync error:',e));
 }
 
 function sendToSheets(rec){

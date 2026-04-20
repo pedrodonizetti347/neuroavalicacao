@@ -684,7 +684,7 @@ function enterApp(u){
     const months=[...new Set(allData.map(r=>r.DATA.slice(0,7)))].sort().reverse();
     if(months.length){const[y,m]=months[0].split('-').map(Number);curYear=y;curMonth=m-1;viewYear=y;}
   }
-  buildMonthChips();renderAll();
+  buildMonthChips();renderAll();syncFromSheets();
 }
 function doLogout(){
   addLog('Logout',`${curUser?.name} saiu`);
@@ -1029,6 +1029,30 @@ function renderTable(){
 function goPage(d){page=Math.max(1,page+d);renderTable();}
 
 // ═══════════════════════════════════════════════════════════
+// GOOGLE SHEETS INTEGRATION
+// ═══════════════════════════════════════════════════════════
+const SHEETS_URL='https://script.google.com/macros/s/AKfycbzZaW_Lil1wSC2Rar3ii96af9RlHp_T0CkiQJsJj-WcSx4el3fWGugo_lhi0RjoNG2zYg/exec';
+
+function syncFromSheets(){
+  fetch(SHEETS_URL)
+    .then(r=>r.json())
+    .then(rows=>{
+      if(!Array.isArray(rows)||!rows.length)return;
+      rows.forEach(r=>{
+        if(!r.DATA||!r.NOME)return;
+        const jaExiste=allData.some(x=>x.DATA===r.DATA&&x.NOME===r.NOME&&(x.CARTEIRINHA||'')===(r.CARTEIRINHA||''));
+        if(!jaExiste)allData.push(r);
+      });
+      saveAll();buildMonthChips();renderAll();
+    })
+    .catch(()=>{});
+}
+
+function sendToSheets(rec){
+  fetch(SHEETS_URL,{method:'POST',body:JSON.stringify(rec)}).catch(()=>{});
+}
+
+// ═══════════════════════════════════════════════════════════
 // SAVE RECORD
 // ═══════════════════════════════════════════════════════════
 function saveRecord(){
@@ -1040,6 +1064,7 @@ function saveRecord(){
     ORIGEM:document.getElementById('f-orig').value,_addedBy:curUser?.name||'?',_addedAt:new Date().toLocaleString('pt-BR')};
   const[y,m]=date.split('-').map(Number);curYear=y;curMonth=m-1;viewYear=y;
   allData.push(rec);addLog('Novo registro',`${nome} / ${plano} / ${date}`);saveAll();
+  sendToSheets(rec);
   buildMonthChips();renderAll();
   document.getElementById('f-nome').value='';document.getElementById('f-cart').value='';document.getElementById('f-tel').value='';
   toast('Ligação salva!','success');showView('acompanhamento');

@@ -648,14 +648,13 @@ function doLogin(){
   }
   const u=users.find(x=>x.email.toLowerCase()===email&&x.active);
   if(!u){setErr('login-err','Email nao encontrado ou usuario inativo.');return;}
-  if(btoa(pwd)!==u.pwdHash){setErr('login-err','Senha incorreta. Tente novamente.');addLog('Login falhou',email);return;}
   if(u.firstAccess){
-    // Force password change
     sessionStorage.setItem('pendingUserId',u.id);
     document.getElementById('first-sub').textContent=`Olá, ${u.name}! Este é seu primeiro acesso. Crie sua senha pessoal.`;
     showScreen('screen-first');
     return;
   }
+  if(btoa(pwd)!==u.pwdHash){setErr('login-err','Senha incorreta. Tente novamente.');addLog('Login falhou',email);return;}
   enterApp(u);
 }
 function enterApp(u){

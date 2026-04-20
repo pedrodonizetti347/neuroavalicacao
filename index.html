@@ -553,8 +553,16 @@ function isPart(r){return r.PLANO==='Particular';}
 function loadAll(){
   // Data
   try{const r=localStorage.getItem(SK_DATA);if(r)allData=JSON.parse(r);}catch(e){allData=[];}
-  if(!allData.some(r=>r.DATA.startsWith('2026-03')))allData=[...MARCH_SEED,...allData];
-  if(!allData.some(r=>r.DATA.startsWith('2026-04')))allData=[...allData,...ABRIL_SEED];
+  // Merge seed data: adiciona apenas registros do seed que ainda não existem no localStorage
+  // (comparando por NOME + DATA + CARTEIRINHA), preservando lançamentos manuais novos
+  function mergeSeed(seed){
+    seed.forEach(s=>{
+      const jaExiste=allData.some(r=>r.DATA===s.DATA&&r.NOME===s.NOME&&(r.CARTEIRINHA||'')===(s.CARTEIRINHA||''));
+      if(!jaExiste)allData.push(s);
+    });
+  }
+  mergeSeed(MARCH_SEED);
+  mergeSeed(ABRIL_SEED);
   // Users
   try{const r=localStorage.getItem(SK_USERS);if(r)users=JSON.parse(r);}catch(e){users=[];}
   if(!users.length) users=defaultUsers();

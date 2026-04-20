@@ -682,12 +682,14 @@ function enterApp(u){
   document.getElementById('h-av').style.background=u.color;
   document.getElementById('h-name').textContent=u.name;
   document.getElementById('h-role').textContent=u.role;
-  if(u.role==='Admin')document.body.classList.add('admin-mode');
+  // Garante que admin-mode seja aplicado/removido corretamente
+  document.body.classList.remove('admin-mode');
+  if(u.role==='Admin') document.body.classList.add('admin-mode');
   document.getElementById('del-col-h').textContent=u.role==='Admin'?'':'';
   populateAtSelect();
   addLog('Login',`${u.name} (${u.email}) entrou`);
-  // Set current month — if today's month has data use it, otherwise last month with data
-  const now=new Date();curYear=now.getFullYear();curMonth=now.getMonth();viewYear=curYear;
+  // Set current month — usa data fixada (20/04/2026)
+  const now=TODAY_DATE;curYear=now.getFullYear();curMonth=now.getMonth();viewYear=curYear;
   const curMD=monthData(curYear,curMonth);
   if(!curMD.length){
     const months=[...new Set(allData.map(r=>r.DATA.slice(0,7)))].sort().reverse();

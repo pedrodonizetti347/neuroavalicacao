@@ -685,6 +685,7 @@ function enterApp(u){
     if(months.length){const[y,m]=months[0].split('-').map(Number);curYear=y;curMonth=m-1;viewYear=y;}
   }
   buildMonthChips();renderAll();syncFromSheets();
+  setInterval(syncFromSheets, 120000);
 }
 function doLogout(){
   addLog('Logout',`${curUser?.name} saiu`);

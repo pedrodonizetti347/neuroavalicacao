@@ -693,7 +693,8 @@ function enterApp(u){
     const months=[...new Set(allData.map(r=>r.DATA.slice(0,7)))].sort().reverse();
     if(months.length){const[y,m]=months[0].split('-').map(Number);curYear=y;curMonth=m-1;viewYear=y;}
   }
-  buildMonthChips();renderAll();
+  buildMonthChips();renderAll();syncFromSheets();
+  setInterval(syncFromSheets, 120000);
 }
 function doLogout(){
   addLog('Logout',`${curUser?.name} saiu`);
@@ -1042,9 +1043,29 @@ function goPage(d){page=Math.max(1,page+d);renderTable();}
 // ═══════════════════════════════════════════════════════════
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbwr-SF92iogoYgxNQIe5GP6BlZ043yzzJzfXAlDf__ZihqpMC-GpzICReYtI-AoaRU59A/exec';
 
-function syncFromSheets(){ /* sync desativado — sem backend */ }
+function syncFromSheets(){
+  fetch(SHEETS_URL+'?t='+Date.now())
+    .then(r=>r.json())
+    .then(rows=>{
+      if(!Array.isArray(rows)||!rows.length)return;
+      let changed=false;
+      rows.forEach(r=>{
+        if(!r.DATA||!r.NOME)return;
+        const dataStr=String(r.DATA).trim();
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dataStr))return;
+        r.DATA=dataStr;
+        const jaExiste=allData.some(x=>x.DATA===r.DATA&&x.NOME===r.NOME&&(x.CARTEIRINHA||'')===(r.CARTEIRINHA||''));
+        if(!jaExiste){allData.push(r);changed=true;}
+      });
+      allData=allData.filter(r=>r.DATA&&/^\d{4}-\d{2}-\d{2}$/.test(String(r.DATA).trim()));
+      if(changed){saveAll();buildMonthChips();renderAll();}
+    })
+    .catch(()=>{}); // erro silencioso — sem exibir no console
+}
 
-function sendToSheets(rec){ /* sync desativado — sem backend */ }
+function sendToSheets(rec){
+  fetch(SHEETS_URL,{method:'POST',body:JSON.stringify(rec)}).catch(()=>{});
+}
 
 // ═══════════════════════════════════════════════════════════
 // SAVE RECORD

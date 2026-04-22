@@ -517,10 +517,11 @@ tr:hover td{background:var(--paper)}
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// DATA FIXADA — sistema opera como se hoje fosse 20/04/2026
+// ═══════════════════════════════════════════════════════════
+// DATA REAL — sistema sempre opera com a data atual do dispositivo
 // ═══════════════════════════════════════════════════════════
 const TODAY_DATE = new Date();
-const TODAY_STR = TODAY_DATE.toLocaleDateString('en-CA'); // formato YYYY-MM-DD
+const TODAY_STR = `${TODAY_DATE.getFullYear()}-${String(TODAY_DATE.getMonth()+1).padStart(2,'0')}-${String(TODAY_DATE.getDate()).padStart(2,'0')}`;
 
 // ═══════════════════════════════════════════════════════════
 // SEEDS & CONSTANTS
@@ -688,7 +689,7 @@ function enterApp(u){
   document.getElementById('del-col-h').textContent=u.role==='Admin'?'':'';
   populateAtSelect();
   addLog('Login',`${u.name} (${u.email}) entrou`);
-  // Set current month — usa data fixada (20/04/2026)
+  // Set current month — usa data real do dispositivo
   const now=TODAY_DATE;curYear=now.getFullYear();curMonth=now.getMonth();viewYear=curYear;
   const curMD=monthData(curYear,curMonth);
   if(!curMD.length){

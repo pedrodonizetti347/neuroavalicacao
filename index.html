@@ -519,8 +519,8 @@ tr:hover td{background:var(--paper)}
 // ═══════════════════════════════════════════════════════════
 // DATA FIXADA — sistema opera como se hoje fosse 20/04/2026
 // ═══════════════════════════════════════════════════════════
-const TODAY_STR='2026-04-20';
-const TODAY_DATE=new Date('2026-04-20T12:00:00');
+const TODAY_DATE = new Date();
+const TODAY_STR = TODAY_DATE.toLocaleDateString('en-CA'); // formato YYYY-MM-DD
 
 // ═══════════════════════════════════════════════════════════
 // SEEDS & CONSTANTS

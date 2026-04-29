@@ -315,7 +315,7 @@ tr:hover td{background:var(--paper)}
   <div class="user-pill">
     <div class="user-av" id="h-av" style="background:#1a5c3a">?</div>
     <div><div class="user-name-h" id="h-name">—</div><div class="user-role-h" id="h-role">—</div></div>
-    <button class="h-logout" onclick="syncFromSheets(true)" title="Sincronizar dados agora" style="margin-right:4px">🔄</button><button class="h-logout" onclick="doLogout()">Sair</button>
+    <button class="h-logout" onclick="syncFromSheets(true)" title="Atualizar dados" style="margin-right:4px">🔄</button><button class="h-logout" onclick="doLogout()">Sair</button>
   </div>
 </header>
 
@@ -573,6 +573,7 @@ function loadAll(){
   mergeSeed(MARCH_SEED);
   mergeSeed(ABRIL_SEED);
   mergeSeed(DIA20_SEED);
+  dedupAllData(); // limpa duplicatas herdadas das seeds
   // Users
   try{const r=localStorage.getItem(SK_USERS);if(r)users=JSON.parse(r);}catch(e){users=[];}
   if(!users.length) users=defaultUsers();
@@ -696,7 +697,7 @@ function enterApp(u){
     const months=[...new Set(allData.map(r=>r.DATA.slice(0,7)))].sort().reverse();
     if(months.length){const[y,m]=months[0].split('-').map(Number);curYear=y;curMonth=m-1;viewYear=y;}
   }
-  buildMonthChips();renderAll();syncFromSheets(true);
+  buildMonthChips();renderAll();dedupAllData();syncFromSheets(true);
   setInterval(syncFromSheets, 120000);
 }
 function doLogout(){
@@ -1046,6 +1047,19 @@ function goPage(d){page=Math.max(1,page+d);renderTable();}
 // ═══════════════════════════════════════════════════════════
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbx0LEIObtq4xdu9QP4cAfHs9Nk1Cx82_oV47ZQIot7h2PxP08l9m0MokRkx8noouenKcg/exec';
 
+function dedupAllData(){
+  // Remove duplicatas: mantém apenas o PRIMEIRO registro por NOME+DATA
+  const seen=new Set();
+  const antes=allData.length;
+  allData=allData.filter(r=>{
+    const key=r.DATA+'||'+r.NOME.trim().toUpperCase();
+    if(seen.has(key))return false;
+    seen.add(key);return true;
+  });
+  const removidos=antes-allData.length;
+  if(removidos>0){saveAll();console.log('Duplicatas removidas:',removidos);}
+  return removidos;
+}
 function syncFromSheets(showFeedback){
   if(showFeedback)toast('Sincronizando dados…','');
   fetch(SHEETS_URL+'?t='+Date.now())
@@ -1058,17 +1072,14 @@ function syncFromSheets(showFeedback){
         const dataStr=String(r.DATA).trim();
         if(!/^\d{4}-\d{2}-\d{2}$/.test(dataStr))return;
         r.DATA=dataStr;
-        // Deduplicacao por NOME + DATA (evita lancamentos duplos entre atendentes)
-        const jaExiste=allData.some(x=>x.DATA===r.DATA&&x.NOME===r.NOME);
+        const jaExiste=allData.some(x=>x.DATA===r.DATA&&x.NOME.trim()===r.NOME.trim());
         if(!jaExiste){allData.push(r);changed=true;}
       });
       allData=allData.filter(r=>r.DATA&&/^\d{4}-\d{2}-\d{2}$/.test(String(r.DATA).trim()));
       if(changed){saveAll();buildMonthChips();renderAll();}
       if(showFeedback)toast('Dados atualizados!','success');
     })
-    .catch(()=>{
-      if(showFeedback)toast('Falha na sincronizacao com a planilha.','error');
-    });
+    .catch(()=>{if(showFeedback)toast('\u26a0\ufe0f Falha ao sincronizar.','error');});
 }
 
 function sendToSheets(rec){
@@ -1084,11 +1095,11 @@ function saveRecord(){
   const planoVal=document.getElementById('f-plano').value;
   if(!date||!nome||!planoVal){toast('Preencha data, nome e plano.','error');return;}
   if(!cart&&planoVal!=='Particular'){toast('Preencha a carteirinha do paciente.','error');return;}
-  // ── ANTI-DUPLICATA: bloqueia mesmo nome + mesma data (independente de atendente) ──
-  const nomeUpper=nome.toUpperCase();
-  const jaLancado=allData.some(r=>r.DATA===date&&r.NOME===nomeUpper);
-  if(jaLancado){toast('⚠️ Este paciente já foi lançado nesta data!','error');return;}
-  const rec={DATA:date,ATENDENTE:document.getElementById('f-at').value,NOME:nomeUpper,PLANO:plano,
+  // ── ANTI-DUPLICATA: bloqueia mesmo nome + mesma data ──
+  const nomeUp=nome.toUpperCase().trim();
+  const jaCadastrado=allData.some(r=>r.DATA===date&&r.NOME.trim()===nomeUp);
+  if(jaCadastrado){toast('\u26a0\ufe0f Paciente j\u00e1 lan\u00e7ado nesta data!','error');return;}
+  const rec={DATA:date,ATENDENTE:document.getElementById('f-at').value,NOME:nomeUp,PLANO:plano,
     CARTEIRINHA:document.getElementById('f-cart').value,PROCEDIMENTO:document.getElementById('f-proc').value||'1ª CONSULTA',
     TEM_SADT:document.getElementById('f-sadt').value,TELEFONE:document.getElementById('f-tel').value,
     ORIGEM:document.getElementById('f-orig').value,_addedBy:curUser?.name||'?',_addedAt:new Date().toLocaleString('pt-BR')};

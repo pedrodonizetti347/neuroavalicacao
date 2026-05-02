@@ -1848,11 +1848,9 @@ function exportarRelatorioCSV() {
   const header = 'Data,Hora,Profissional,Paciente,Convenio,Procedimento,Tipo';
   const rows = relatorioFiltrado.map(d =>
     [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.convenio||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo]
-    .map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')
+    .map(function(v){ return '"' + String(v).replace(/"/g,'""')+'"'; }).join(',')
   );
-  const csv = '﻿' + header + '
-' + rows.join('
-');
+  const csv = '\uFEFF' + header + '\n' + rows.join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
   a.download = 'atendimentos_prodoctor.csv';

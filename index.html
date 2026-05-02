@@ -549,6 +549,58 @@ tr:hover td{background:var(--paper)}
       <button class="btn" onclick="document.getElementById('add-user-panel').style.display='none'">Cancelar</button>
     </div>
   </div>
+  <!-- RELATÓRIO DE ATENDIMENTOS PRODOCTOR -->
+  <div class="panel" style="margin-bottom:14px">
+    <div class="ph" style="background:linear-gradient(90deg,#0f3d26,#1a5c3a);color:#fff;border-radius:16px 16px 0 0;padding:14px 18px">
+      <h2 style="color:#fff">📊 Relatório de Atendimentos — ProDoctor</h2>
+      <span id="rel-status" style="font-size:11px;color:rgba(255,255,255,.6);margin-left:auto">Selecione o mês e clique em Buscar</span>
+    </div>
+    <div style="padding:14px 18px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;border-bottom:1px solid var(--paper3)">
+      <div class="fg" style="margin:0">
+        <label style="font-size:11px">Mês</label>
+        <select id="rel-mes" style="font-family:inherit;font-size:13px;padding:7px 11px;border:1px solid var(--paper3);border-radius:8px;background:var(--white);color:var(--ink)">
+          <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
+          <option value="4">Abril</option><option value="5" selected>Maio</option><option value="6">Junho</option>
+          <option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option>
+          <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+        </select>
+      </div>
+      <div class="fg" style="margin:0">
+        <label style="font-size:11px">Ano</label>
+        <input type="number" id="rel-ano" value="2026" style="font-family:inherit;font-size:13px;padding:7px 11px;border:1px solid var(--paper3);border-radius:8px;background:var(--white);color:var(--ink);width:90px">
+      </div>
+      <div class="fg" style="margin:0">
+        <label style="font-size:11px">Profissional</label>
+        <select id="rel-prof" style="font-family:inherit;font-size:13px;padding:7px 11px;border:1px solid var(--paper3);border-radius:8px;background:var(--white);color:var(--ink)">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="fg" style="margin:0">
+        <label style="font-size:11px">Tipo</label>
+        <select id="rel-tipo" style="font-family:inherit;font-size:13px;padding:7px 11px;border:1px solid var(--paper3);border-radius:8px;background:var(--white);color:var(--ink)">
+          <option value="">Todos</option>
+          <option value="testagem">Testagem</option>
+          <option value="devolutiva">Devolutiva</option>
+          <option value="primeira">1ª Consulta</option>
+          <option value="psicoterapia">Psicoterapia</option>
+          <option value="outro">Outros</option>
+        </select>
+      </div>
+      <button onclick="buscarRelatorio()" style="font-family:inherit;font-size:13px;font-weight:600;padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:8px;cursor:pointer">🔍 Buscar</button>
+      <button onclick="exportarRelatorioCSV()" id="rel-btn-csv" style="display:none;font-family:inherit;font-size:13px;padding:8px 14px;background:var(--paper);border:1px solid var(--paper3);border-radius:8px;cursor:pointer;color:var(--ink3)">⬇ CSV</button>
+      <button onclick="exportarRelatorioPDF()" id="rel-btn-pdf" style="display:none;font-family:inherit;font-size:13px;padding:8px 14px;background:var(--paper);border:1px solid var(--paper3);border-radius:8px;cursor:pointer;color:var(--ink3)">📄 PDF</button>
+    </div>
+    <!-- Sumário -->
+    <div id="rel-sumario" style="display:none;padding:14px 18px;border-bottom:1px solid var(--paper3);display:flex;gap:16px;flex-wrap:wrap"></div>
+    <!-- Tabela -->
+    <div style="overflow-x:auto;max-height:420px;overflow-y:auto">
+      <table id="rel-table" style="display:none"><thead><tr>
+        <th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Convênio</th><th>Procedimento</th><th>Tipo</th>
+      </tr></thead><tbody id="rel-tbody"></tbody></table>
+      <div id="rel-empty" style="padding:32px;text-align:center;color:var(--ink3);font-size:13px">Clique em Buscar para carregar os atendimentos do ProDoctor.</div>
+    </div>
+  </div>
+
   <!-- Log -->
   <div class="panel">
     <div class="ph"><h2>Log de atividades</h2><span class="pill" id="log-count"></span></div>
@@ -618,49 +670,6 @@ tr:hover td{background:var(--paper)}
         <div class="meta-prog-bar"><div class="meta-prog-fill" id="prog-max-fill" style="background:var(--blue);width:0%"></div></div>
         <div class="meta-prog-status" id="prog-max-status" style="color:var(--ink3)">Aguardando dados...</div>
       </div>
-    </div>
-  </div>
-
-
-  <!-- METAS DE PRODUÇÃO — ProDoctor ao vivo -->
-  <div class="meta-card" style="margin-bottom:14px">
-    <div class="meta-card-header" style="background:linear-gradient(90deg,#0f3d26,#1a5c3a);color:#fff;border-radius:16px 16px 0 0">
-      <h2 style="color:#fff">📡 Metas de Produção — <span id="pd-mes-titulo">Mês atual</span> <span style="font-size:10px;font-weight:400;opacity:.7">(ProDoctor ao vivo)</span></h2>
-      <span id="pd-status" style="font-size:10px;color:rgba(255,255,255,.6);margin-left:auto">Carregando...</span>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--paper3)">
-      <!-- Testagens -->
-      <div style="padding:18px 16px;border-right:1px solid var(--paper3);text-align:center">
-        <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🧠 Testagens</div>
-        <div id="pd-testagens" style="font-size:36px;font-weight:700;color:var(--green);line-height:1;letter-spacing:-2px">—</div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:4px">agendadas no mês</div>
-        <div style="margin-top:10px;height:6px;background:var(--paper2);border-radius:3px;overflow:hidden">
-          <div id="pd-bar-testagens" style="height:100%;background:var(--green);border-radius:3px;width:0%;transition:.5s"></div>
-        </div>
-      </div>
-      <!-- Entrega de Laudo -->
-      <div style="padding:18px 16px;border-right:1px solid var(--paper3);text-align:center">
-        <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">📋 Devolutiva</div>
-        <div id="pd-laudos" style="font-size:36px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-2px">—</div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:4px">agendadas no mês</div>
-        <div style="margin-top:10px;height:6px;background:var(--paper2);border-radius:3px;overflow:hidden">
-          <div id="pd-bar-laudos" style="height:100%;background:var(--blue);border-radius:3px;width:0%;transition:.5s"></div>
-        </div>
-      </div>
-      <!-- 1ª Consulta -->
-      <div style="padding:18px 16px;text-align:center">
-        <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🩺 1ª Consulta</div>
-        <div id="pd-primeiras" style="font-size:36px;font-weight:700;color:var(--purple);line-height:1;letter-spacing:-2px">—</div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:4px">agendadas no mês</div>
-        <div style="margin-top:10px;height:6px;background:var(--paper2);border-radius:3px;overflow:hidden">
-          <div id="pd-bar-primeiras" style="height:100%;background:var(--purple);border-radius:3px;width:0%;transition:.5s"></div>
-        </div>
-      </div>
-    </div>
-    <div style="padding:14px 18px;display:flex;align-items:center;gap:16px">
-      <div style="font-size:12px;color:var(--ink3)">Total de procedimentos no mês:</div>
-      <div id="pd-total" style="font-size:20px;font-weight:700;color:var(--ink)">—</div>
-      <button onclick="limparCachePD()" style="margin-left:auto;font-family:inherit;font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid var(--paper3);background:var(--paper);cursor:pointer;color:var(--ink3)">🔄 Atualizar agora</button>
     </div>
   </div>
 
@@ -1464,46 +1473,27 @@ function toast(msg,type='success'){
 
 
 // ═══════════════════════════════════════════════════════════
-// INTEGRAÇÃO PRODOCTOR — via Google Apps Script proxy
+// INTEGRAÇÃO PRODOCOR
 // ═══════════════════════════════════════════════════════════
-// Cole aqui a URL do seu Apps Script após republicar com o código novo
 const PRODOCOR_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFjC5joHY6rVZ3mG1OvREuiO3zlh75q8LhhhQ5s2boDOb6CNC1IqFgsGq9L4ttQApU/exec';
 
 let prodoctorCache = {};
-let pdUltimaAtualizacao = null;
 
 function buscarAtendimentosProDoctor(ano, mes, callback) {
-  const key = ano + '-' + String(mes).padStart(2, '0');
-  // Cache de 5 minutos por mês
-  const agora = Date.now();
-  if (prodoctorCache[key] && prodoctorCache[key]._ts && (agora - prodoctorCache[key]._ts) < 300000) {
-    callback(prodoctorCache[key]);
-    return;
-  }
+  const key = ano + '-' + mes;
+  if (prodoctorCache[key]) { callback(prodoctorCache[key]); return; }
 
-  // mes aqui já vem como índice 0-based (curMonth), converter para 1-based
   const mesFormatado = String(mes + 1).padStart(2, '0');
-  const url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mesFormatado + '&t=' + agora;
-
-  document.getElementById('pd-status') && (document.getElementById('pd-status').textContent = '🔄 Buscando dados ao vivo...');
+  const url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mesFormatado;
 
   fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      if (data && !data.erro) {
-        data._ts = Date.now();
-        prodoctorCache[key] = data;
-        pdUltimaAtualizacao = new Date().toLocaleTimeString('pt-BR');
-        document.getElementById('pd-status') && (document.getElementById('pd-status').textContent = '✅ Atualizado às ' + pdUltimaAtualizacao);
-      } else {
-        console.warn('ProDoctor retornou erro:', data);
-        document.getElementById('pd-status') && (document.getElementById('pd-status').textContent = '⚠️ ' + (data && data.mensagem ? data.mensagem : 'Erro ao buscar'));
-      }
-      callback(data && !data.erro ? data : null);
+      prodoctorCache[key] = data;
+      callback(data);
     })
     .catch(function(err) {
       console.error('Erro ProDoctor:', err);
-      document.getElementById('pd-status') && (document.getElementById('pd-status').textContent = '⚠️ Falha na conexão com ProDoctor');
       callback(null);
     });
 }
@@ -1522,60 +1512,10 @@ const METAS_CONFIG = {
 
 function renderMetas() {
   const data = monthData(curYear, curMonth);
-
-  // Atualiza título do card ProDoctor com o mês atual
-  const tituloEl = document.getElementById('pd-mes-titulo');
-  if (tituloEl) tituloEl.textContent = monthLabel(curYear, curMonth);
-
-  // Buscar dados reais do ProDoctor
+  // Buscar dados reais do ProDoctor para Prevent
   buscarAtendimentosProDoctor(curYear, curMonth, function(pdData) {
     renderMetasComProDoctor(data, pdData);
-    atualizarCardsProdocor(pdData);
   });
-}
-
-// ── Atualiza os cards de Metas de Produção (Testagem / Laudo / 1ª Consulta) ──
-function atualizarCardsProdocor(pdData) {
-  const setEl = function(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val !== undefined && val !== null ? val : '—';
-  };
-  const setBar = function(id, pct) {
-    const el = document.getElementById(id);
-    if (el) el.style.width = Math.min(pct, 100) + '%';
-  };
-
-  if (!pdData) {
-    setEl('pd-testagens', '—');
-    setEl('pd-laudos', '—');
-    setEl('pd-primeiras', '—');
-    setEl('pd-total', '—');
-    return;
-  }
-
-  const testagens = pdData.testagens || 0;
-  const laudos    = pdData.devolutivas || pdData.laudos || 0;
-  const primeiras = pdData.primeiras || 0;
-  const total     = pdData.total     || 0;
-
-  setEl('pd-testagens', testagens);
-  setEl('pd-laudos', laudos);
-  setEl('pd-primeiras', primeiras);
-  setEl('pd-total', total);
-
-  // Barras de progresso relativas ao maior valor entre os três
-  const maxVal = Math.max(testagens, laudos, primeiras, 1);
-  setBar('pd-bar-testagens', (testagens / maxVal) * 100);
-  setBar('pd-bar-laudos',    (laudos    / maxVal) * 100);
-  setBar('pd-bar-primeiras', (primeiras / maxVal) * 100);
-}
-
-// ── Limpar cache e recarregar dados ProDoctor ──
-function limparCachePD() {
-  prodoctorCache = {};
-  pdUltimaAtualizacao = null;
-  renderMetas();
-  toast('Buscando dados atualizados do ProDoctor...', '');
 }
 
 function renderMetasComProDoctor(data, pdData) {
@@ -1767,6 +1707,211 @@ try{
 }catch(e){}
 document.getElementById('f-data').value=TODAY_STR;
 loadAll();
+
+// ═══════════════════════════════════════════════════════════════════
+// RELATÓRIO DE ATENDIMENTOS — PRODOCTOR (Admin)
+// ═══════════════════════════════════════════════════════════════════
+
+let relatorioCache = null;
+let relatorioFiltrado = [];
+
+// Códigos de procedimento
+const COD_PSICOTERAPIA = '50000470';
+const COD_NEURO       = '50001221';
+
+function classificarProcedimento(proc, codigo) {
+  const p = (proc || '').toUpperCase();
+  const c = String(codigo || '');
+  if (c === COD_PSICOTERAPIA || p.includes('PSICOTERAPIA') || p.includes('SESSÃO DE PSICO')) return 'psicoterapia';
+  if (p.includes('TESTAGEM') || p.includes('SESSÃO - TESTAGEM')) return 'testagem';
+  if (p.includes('DEVOLUTIVA')) return 'devolutiva';
+  if (p.includes('PRIMEIRA CONSULTA')) return 'primeira';
+  return 'outro';
+}
+
+const TIPO_LABEL = {
+  testagem: '🧠 Testagem',
+  devolutiva: '📋 Devolutiva',
+  primeira: '🩺 1ª Consulta',
+  psicoterapia: '💬 Psicoterapia',
+  outro: '📌 Outro'
+};
+
+const TIPO_COLOR = {
+  testagem: 'var(--green)',
+  devolutiva: 'var(--blue)',
+  primeira: 'var(--purple)',
+  psicoterapia: '#0f5454',
+  outro: 'var(--ink3)'
+};
+
+async function buscarRelatorio() {
+  const mes  = parseInt(document.getElementById('rel-mes').value);
+  const ano  = parseInt(document.getElementById('rel-ano').value);
+  const prof = document.getElementById('rel-prof').value;
+  const tipo = document.getElementById('rel-tipo').value;
+
+  document.getElementById('rel-status').textContent = '🔄 Buscando dados no ProDoctor...';
+  document.getElementById('rel-empty').textContent = 'Carregando...';
+  document.getElementById('rel-table').style.display = 'none';
+  document.getElementById('rel-sumario').style.display = 'none';
+  document.getElementById('rel-btn-csv').style.display = 'none';
+  document.getElementById('rel-btn-pdf').style.display = 'none';
+
+  try {
+    const url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mes + '&detalhes=1&t=' + Date.now();
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (!data || data.erro) {
+      document.getElementById('rel-status').textContent = '⚠️ Erro: ' + (data && data.mensagem ? data.mensagem : 'Falha na conexão');
+      document.getElementById('rel-empty').textContent = 'Erro ao carregar dados do ProDoctor.';
+      return;
+    }
+
+    // Montar lista de profissionais para o select
+    const detalhes = data.detalhes || [];
+    const profissionais = [...new Set(detalhes.map(d => d.profissional).filter(Boolean))].sort();
+    const relProf = document.getElementById('rel-prof');
+    relProf.innerHTML = '<option value="">Todos</option>' +
+      profissionais.map(p => `<option value="${p}">${p}</option>`).join('');
+    if (prof) relProf.value = prof;
+
+    relatorioCache = detalhes;
+    filtrarRelatorio();
+
+    document.getElementById('rel-status').textContent = '✅ Atualizado — ' + detalhes.length + ' atendimentos encontrados';
+    document.getElementById('rel-btn-csv').style.display = 'inline-block';
+    document.getElementById('rel-btn-pdf').style.display = 'inline-block';
+
+  } catch (err) {
+    document.getElementById('rel-status').textContent = '⚠️ Falha na conexão';
+    document.getElementById('rel-empty').textContent = 'Erro ao buscar dados.';
+  }
+}
+
+function filtrarRelatorio() {
+  if (!relatorioCache) return;
+  const prof = document.getElementById('rel-prof').value;
+  const tipo = document.getElementById('rel-tipo').value;
+
+  relatorioFiltrado = relatorioCache.filter(d => {
+    if (d.tipo === 'ignorado_status') return false;
+    if (prof && d.profissional !== prof) return false;
+    if (tipo && d.tipo !== tipo) return false;
+    return true;
+  });
+
+  // Sumário
+  const contagem = {};
+  relatorioFiltrado.forEach(d => { contagem[d.tipo] = (contagem[d.tipo] || 0) + 1; });
+  const sumHtml = Object.entries(contagem).map(([t, n]) =>
+    `<div style="background:var(--paper2);border-radius:8px;padding:8px 14px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:18px;font-weight:700;color:${TIPO_COLOR[t]}">${n}</span>
+      <span style="font-size:12px;color:var(--ink3)">${TIPO_LABEL[t] || t}</span>
+    </div>`
+  ).join('') + `<div style="background:var(--paper2);border-radius:8px;padding:8px 14px;display:flex;align-items:center;gap:8px">
+    <span style="font-size:18px;font-weight:700;color:var(--ink)">${relatorioFiltrado.length}</span>
+    <span style="font-size:12px;color:var(--ink3)">Total</span>
+  </div>`;
+
+  const sumEl = document.getElementById('rel-sumario');
+  sumEl.innerHTML = sumHtml;
+  sumEl.style.display = 'flex';
+
+  // Tabela
+  if (relatorioFiltrado.length === 0) {
+    document.getElementById('rel-table').style.display = 'none';
+    document.getElementById('rel-empty').textContent = 'Nenhum atendimento encontrado com os filtros selecionados.';
+    document.getElementById('rel-empty').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('rel-empty').style.display = 'none';
+  document.getElementById('rel-table').style.display = 'table';
+
+  const linhas = relatorioFiltrado.map(d => `<tr>
+    <td style="white-space:nowrap">${d.data || '—'}</td>
+    <td style="white-space:nowrap">${d.hora || '—'}</td>
+    <td style="font-weight:500">${d.profissional || '—'}</td>
+    <td>${d.paciente || '—'}</td>
+    <td style="font-size:11px">${d.convenio || '—'}</td>
+    <td style="font-size:11px">${d.procedimento || '—'}</td>
+    <td><span style="font-size:11px;font-weight:600;color:${TIPO_COLOR[d.tipo] || 'var(--ink3)'}">${TIPO_LABEL[d.tipo] || d.tipo}</span></td>
+  </tr>`).join('');
+
+  document.getElementById('rel-tbody').innerHTML = linhas;
+}
+
+function exportarRelatorioCSV() {
+  if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
+  const header = 'Data,Hora,Profissional,Paciente,Convenio,Procedimento,Tipo';
+  const rows = relatorioFiltrado.map(d =>
+    [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.convenio||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo]
+    .map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')
+  );
+  const csv = '﻿' + header + '
+' + rows.join('
+');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'atendimentos_prodoctor.csv';
+  a.click();
+  toast('CSV exportado!', 'success');
+}
+
+function exportarRelatorioPDF() {
+  if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
+
+  const mes  = document.getElementById('rel-mes');
+  const ano  = document.getElementById('rel-ano').value;
+  const mesNome = mes.options[mes.selectedIndex].text;
+  const prof = document.getElementById('rel-prof').value || 'Todos os profissionais';
+
+  // Contagem por tipo
+  const contagem = {};
+  relatorioFiltrado.forEach(d => { contagem[d.tipo] = (contagem[d.tipo] || 0) + 1; });
+  const resumo = Object.entries(contagem).map(([t,n]) => `${TIPO_LABEL[t]}: ${n}`).join(' | ');
+
+  const linhasHTML = relatorioFiltrado.map((d, i) => `
+    <tr style="background:${i%2===0?'#f9f9f9':'#fff'}">
+      <td>${d.data||'—'}</td>
+      <td>${d.hora||'—'}</td>
+      <td><strong>${d.profissional||'—'}</strong></td>
+      <td>${d.paciente||'—'}</td>
+      <td style="font-size:11px">${d.convenio||'—'}</td>
+      <td style="font-size:11px">${d.procedimento||'—'}</td>
+      <td style="font-size:11px;font-weight:600">${TIPO_LABEL[d.tipo]||d.tipo}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Relatório de Atendimentos</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:12px;color:#222;padding:20px}
+    h1{font-size:16px;color:#0f3d26;margin:0 0 4px}
+    .sub{font-size:11px;color:#666;margin-bottom:14px}
+    .resumo{background:#e4f0e9;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:12px;font-weight:600;color:#0f3d26}
+    table{width:100%;border-collapse:collapse}
+    th{background:#0f3d26;color:#fff;padding:7px 10px;font-size:11px;text-align:left}
+    td{padding:6px 10px;border-bottom:1px solid #eee;font-size:11px}
+    .footer{margin-top:16px;font-size:10px;color:#999;text-align:right}
+  </style></head><body>
+  <h1>Relatório de Atendimentos — Neuroavaliação na Prática</h1>
+  <div class="sub">${mesNome}/${ano} · ${prof} · Total: ${relatorioFiltrado.length} atendimentos</div>
+  <div class="resumo">${resumo}</div>
+  <table>
+    <thead><tr><th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Convênio</th><th>Procedimento</th><th>Tipo</th></tr></thead>
+    <tbody>${linhasHTML}</tbody>
+  </table>
+  <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')} · Sistema Neuroavaliação Agendamento</div>
+  <script>window.onload=()=>{window.print()}<\/script>
+  </body></html>`;
+
+  const w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
 </script>
 </body>
 </html>

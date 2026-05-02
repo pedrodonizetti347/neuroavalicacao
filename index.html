@@ -18,6 +18,50 @@
   --purple:#4a2472;--purple-l:#f0e9f8;
   --teal:#0f5454;--teal-l:#e2f0f0;
 }
+
+/* ── METAS ── */
+.meta-hero{background:linear-gradient(135deg,#1a5c3a 0%,#0f3d26 100%);border-radius:16px;padding:24px 28px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.meta-hero::before{content:'🏆';position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.15}
+.meta-hero-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.meta-hero-sub{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:16px}
+.meta-hero-winner{display:flex;align-items:center;gap:14px}
+.meta-hero-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.4)}
+.meta-hero-info{flex:1}
+.meta-hero-name{font-size:20px;font-weight:700}
+.meta-hero-count{font-size:13px;color:rgba(255,255,255,.7);margin-top:2px}
+.meta-hero-prize{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700;white-space:nowrap}
+.meta-card{background:var(--white);border:1px solid var(--paper3);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.meta-card-header{padding:14px 18px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;gap:10px}
+.meta-card-header h2{font-size:13px;font-weight:600}
+.meta-card-header .badge-meta{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-left:auto}
+.meta-progress-wrap{padding:16px 18px}
+.meta-prog-item{margin-bottom:16px}
+.meta-prog-item:last-child{margin-bottom:0}
+.meta-prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.meta-prog-name{font-size:12px;font-weight:600}
+.meta-prog-nums{font-size:11px;color:var(--ink3)}
+.meta-prog-bar{height:10px;background:var(--paper2);border-radius:5px;overflow:hidden}
+.meta-prog-fill{height:100%;border-radius:5px;transition:.4s}
+.meta-prog-status{font-size:10px;font-weight:600;margin-top:4px}
+.ranking-table{width:100%;border-collapse:collapse}
+.ranking-table td{padding:10px 16px;border-bottom:1px solid var(--paper3);font-size:13px}
+.ranking-table tr:last-child td{border-bottom:none}
+.ranking-table tr:hover td{background:var(--paper)}
+.rank-pos{font-size:18px;font-weight:700;width:40px;text-align:center}
+.rank-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.rank-name{font-weight:600;font-size:13px}
+.rank-count{font-size:22px;font-weight:700;text-align:right}
+.rank-sub{font-size:11px;color:var(--ink3);text-align:right}
+.meta-empty{padding:32px;text-align:center;color:var(--ink3);font-size:13px}
+.comissao-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:16px 18px}
+.com-card{background:var(--paper);border-radius:12px;padding:14px;border:1px solid var(--paper3)}
+.com-card-name{font-size:12px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.com-item{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.com-item .lbl{color:var(--ink3)}
+.com-item .val{font-weight:600}
+.com-total{margin-top:8px;padding-top:8px;border-top:1px solid var(--paper3);display:flex;justify-content:space-between;font-size:13px;font-weight:700}
+.com-total .green{color:var(--green)}
+
 body{font-family:'Sora',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;font-size:14px}
 
 /* ── OVERLAY SCREENS ── */
@@ -309,6 +353,7 @@ tr:hover td{background:var(--paper)}
     <button onclick="showView('acompanhamento')">Acompanhamento</button>
     <button onclick="showView('registros')">Registros</button>
     <button onclick="showView('atendentes')">Atendentes</button>
+    <button onclick="showView('metas')">🏆 Metas</button>
     <button onclick="showView('nova')">+ Nova</button>
     <button class="admin-only" onclick="showView('admin')">⚙ Admin</button>
   </nav>
@@ -509,6 +554,109 @@ tr:hover td{background:var(--paper)}
     <div class="ph"><h2>Log de atividades</h2><span class="pill" id="log-count"></span></div>
     <div style="overflow-x:auto"><table><thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Detalhe</th></tr></thead><tbody id="log-tbody"></tbody></table></div>
   </div>
+</div>
+
+
+<!-- METAS E COMISSÕES -->
+<div class="view" id="view-metas">
+
+  <!-- HERO: Meta Herói -->
+  <div class="meta-hero" id="hero-panel">
+    <div class="meta-hero-title">🏆 Meta Herói — Maior Agendador de Convênios</div>
+    <div class="meta-hero-sub">Quem mais agendar em convênios no mês ganha R$ 300,00 a mais</div>
+    <div class="meta-hero-winner" id="hero-winner">
+      <div style="font-size:13px;color:rgba(255,255,255,.6)">Aguardando dados do mês...</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+    <!-- Ranking convênios -->
+    <div class="meta-card">
+      <div class="meta-card-header">
+        <h2>📊 Ranking — Convênios no Mês</h2>
+        <span class="badge-meta b-green" id="rank-mes-lbl" style="background:var(--green-l);color:var(--green)">—</span>
+      </div>
+      <table class="ranking-table" id="ranking-conv-tbody">
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Comissões calculadas -->
+    <div class="meta-card">
+      <div class="meta-card-header">
+        <h2>💰 Comissões Calculadas</h2>
+        <span class="badge-meta" id="com-mes-lbl" style="background:var(--paper2);color:var(--ink3)">—</span>
+      </div>
+      <div class="comissao-grid" id="comissao-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- Metas por plano -->
+  <div class="meta-card">
+    <div class="meta-card-header">
+      <h2>🎯 Progresso das Metas — Prevent Sênior</h2>
+      <span class="badge-meta" id="prevent-status-badge" style="background:var(--paper2);color:var(--ink3)">—</span>
+    </div>
+    <div class="meta-progress-wrap">
+      <!-- Meta mínima: 1413 -->
+      <div class="meta-prog-item">
+        <div class="meta-prog-top">
+          <span class="meta-prog-name">Meta Mínima — R$ 300 por colaborador</span>
+          <span class="meta-prog-nums" id="prog-min-nums">0 / 1413</span>
+        </div>
+        <div class="meta-prog-bar"><div class="meta-prog-fill" id="prog-min-fill" style="background:var(--green);width:0%"></div></div>
+        <div class="meta-prog-status" id="prog-min-status" style="color:var(--ink3)">Aguardando dados...</div>
+      </div>
+      <!-- Meta máxima: 1570 -->
+      <div class="meta-prog-item">
+        <div class="meta-prog-top">
+          <span class="meta-prog-name">Meta Máxima — R$ 500 por colaborador</span>
+          <span class="meta-prog-nums" id="prog-max-nums">0 / 1570</span>
+        </div>
+        <div class="meta-prog-bar"><div class="meta-prog-fill" id="prog-max-fill" style="background:var(--blue);width:0%"></div></div>
+        <div class="meta-prog-status" id="prog-max-status" style="color:var(--ink3)">Aguardando dados...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metas Happy Vida / Notre Dame e CASSI -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <div class="meta-card">
+      <div class="meta-card-header">
+        <h2>🎯 Happy Vida / Notre Dame</h2>
+        <span class="badge-meta" id="hv-badge" style="background:var(--paper2);color:var(--ink3)">—</span>
+      </div>
+      <div class="meta-progress-wrap">
+        <div class="meta-prog-item">
+          <div class="meta-prog-top">
+            <span class="meta-prog-name">Meta — R$ 50 por colaborador</span>
+            <span class="meta-prog-nums" id="prog-hv-nums">0 / 20</span>
+          </div>
+          <div class="meta-prog-bar"><div class="meta-prog-fill" id="prog-hv-fill" style="background:var(--purple);width:0%"></div></div>
+          <div class="meta-prog-status" id="prog-hv-status" style="color:var(--ink3)">Aguardando dados...</div>
+        </div>
+      </div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-card-header">
+        <h2>🎯 CASSI</h2>
+        <span class="badge-meta" id="cassi-badge" style="background:var(--paper2);color:var(--ink3)">—</span>
+      </div>
+      <div class="meta-progress-wrap">
+        <div class="meta-prog-item">
+          <div class="meta-prog-top">
+            <span class="meta-prog-name">Meta — R$ 50 por colaborador</span>
+            <span class="meta-prog-nums" id="prog-cassi-nums">0 / 20</span>
+          </div>
+          <div class="meta-prog-bar"><div class="meta-prog-fill" id="prog-cassi-fill" style="background:var(--teal);width:0%"></div></div>
+          <div class="meta-prog-status" id="prog-cassi-status" style="color:var(--ink3)">Aguardando dados...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 </div><!-- /main -->
@@ -1259,14 +1407,200 @@ function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.querySelectorAll('.h-nav button').forEach(b=>b.classList.remove('active'));
-  const map={dashboard:0,acompanhamento:1,registros:2,atendentes:3,nova:4,admin:5};
+  const map={dashboard:0,acompanhamento:1,registros:2,atendentes:3,nova:4,admin:5,metas:6};
   const btns=document.querySelectorAll('.h-nav button');if(btns[map[v]])btns[map[v]].classList.add('active');
   if(v==='atendentes')renderAtendentes(monthData(curYear,curMonth));
   if(v==='admin')renderAdmin();
+  if(v==='metas')renderMetas();
 }
 function toast(msg,type='success'){
   const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// METAS E COMISSÕES
+// ═══════════════════════════════════════════════════════════
+
+// Configuração das metas
+const METAS_CONFIG = {
+  prevent: { min: 1413, max: 1570, comMin: 300, comMax: 500 },
+  happyvida: { meta: 20, com: 50 },
+  cassi: { meta: 20, com: 50 },
+  heroi: { premio: 300 }
+};
+
+function renderMetas() {
+  const data = monthData(curYear, curMonth);
+  const mesLabel = monthLabel(curYear, curMonth);
+
+  // Labels
+  document.getElementById('rank-mes-lbl').textContent = mesLabel;
+  document.getElementById('com-mes-lbl').textContent = mesLabel;
+
+  // ── Dados por plano ──
+  const preventData = data.filter(r => r.PLANO === 'Prevent');
+  const happyData   = data.filter(r => r.PLANO === 'Notre Dame');
+  const cassiData   = data.filter(r => r.PLANO === 'CASSI');
+  const convData    = data.filter(r => isConv(r));
+
+  // ── Ranking de convênios por atendente ──
+  const rankMap = {};
+  convData.forEach(r => {
+    const at = r.ATENDENTE || r._addedBy || '?';
+    rankMap[at] = (rankMap[at] || 0) + 1;
+  });
+  const ranking = Object.entries(rankMap).sort((a,b) => b[1]-a[1]);
+
+  // Render ranking table
+  const tbody = document.querySelector('#ranking-conv-tbody tbody');
+  if (!tbody) return;
+  if (!ranking.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="meta-empty">Nenhum agendamento de convênio neste mês.</td></tr>';
+  } else {
+    const medals = ['🥇','🥈','🥉'];
+    tbody.innerHTML = ranking.map(([nome, total], i) => {
+      const u = users.find(x => x.name === nome) || {};
+      const cor = u.color || AT_COLORS[i % AT_COLORS.length];
+      const initials = nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      return `<tr>
+        <td class="rank-pos">${medals[i] || (i+1)}</td>
+        <td><div class="rank-av" style="background:${cor}">${initials}</div></td>
+        <td><div class="rank-name">${nome}</div></td>
+        <td><div class="rank-count" style="color:var(--green)">${total}</div><div class="rank-sub">convênios</div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── Meta Herói ──
+  const heroPanel = document.getElementById('hero-winner');
+  if (ranking.length > 0) {
+    const [heroNome, heroTotal] = ranking[0];
+    const u = users.find(x => x.name === heroNome) || {};
+    const cor = u.color || '#1a5c3a';
+    const initials = heroNome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    heroPanel.innerHTML = `
+      <div class="meta-hero-av" style="background:${cor}">${initials}</div>
+      <div class="meta-hero-info">
+        <div class="meta-hero-name">${heroNome}</div>
+        <div class="meta-hero-count">${heroTotal} agendamentos de convênio no mês</div>
+      </div>
+      <div class="meta-hero-prize">🏆 + R$ ${METAS_CONFIG.heroi.premio.toFixed(2).replace('.',',')}</div>
+    `;
+  } else {
+    heroPanel.innerHTML = '<div style="font-size:13px;color:rgba(255,255,255,.6)">Nenhum agendamento de convênio neste mês ainda.</div>';
+  }
+
+  // ── Progresso Prevent ──
+  const prevTotal = preventData.length;
+  const pMin = Math.min((prevTotal / METAS_CONFIG.prevent.min) * 100, 100);
+  const pMax = Math.min((prevTotal / METAS_CONFIG.prevent.max) * 100, 100);
+
+  document.getElementById('prog-min-nums').textContent = `${prevTotal} / ${METAS_CONFIG.prevent.min}`;
+  document.getElementById('prog-max-nums').textContent = `${prevTotal} / ${METAS_CONFIG.prevent.max}`;
+  document.getElementById('prog-min-fill').style.width = pMin + '%';
+  document.getElementById('prog-max-fill').style.width = pMax + '%';
+
+  const minAtingida = prevTotal >= METAS_CONFIG.prevent.min;
+  const maxAtingida = prevTotal >= METAS_CONFIG.prevent.max;
+  const faltaMin = Math.max(0, METAS_CONFIG.prevent.min - prevTotal);
+  const faltaMax = Math.max(0, METAS_CONFIG.prevent.max - prevTotal);
+
+  document.getElementById('prog-min-status').textContent = minAtingida ? '✅ Meta atingida!' : `Faltam ${faltaMin} atendimentos`;
+  document.getElementById('prog-min-status').style.color = minAtingida ? 'var(--green)' : 'var(--amber)';
+  document.getElementById('prog-max-status').textContent = maxAtingida ? '✅ Meta atingida!' : `Faltam ${faltaMax} atendimentos`;
+  document.getElementById('prog-max-status').style.color = maxAtingida ? 'var(--blue)' : 'var(--amber)';
+
+  const preventBadge = document.getElementById('prevent-status-badge');
+  if (maxAtingida) { preventBadge.textContent = '✅ Meta Máxima'; preventBadge.style.background='var(--blue-l)'; preventBadge.style.color='var(--blue)'; }
+  else if (minAtingida) { preventBadge.textContent = '✅ Meta Mínima'; preventBadge.style.background='var(--green-l)'; preventBadge.style.color='var(--green)'; }
+  else { preventBadge.textContent = `${prevTotal}/${METAS_CONFIG.prevent.min}`; preventBadge.style.background='var(--amber-l)'; preventBadge.style.color='var(--amber)'; }
+
+  // ── Progresso Happy Vida / Notre Dame ──
+  const hvTotal = happyData.length;
+  const pHv = Math.min((hvTotal / METAS_CONFIG.happyvida.meta) * 100, 100);
+  const hvAtingida = hvTotal >= METAS_CONFIG.happyvida.meta;
+  document.getElementById('prog-hv-nums').textContent = `${hvTotal} / ${METAS_CONFIG.happyvida.meta}`;
+  document.getElementById('prog-hv-fill').style.width = pHv + '%';
+  document.getElementById('prog-hv-status').textContent = hvAtingida ? '✅ Meta atingida!' : `Faltam ${METAS_CONFIG.happyvida.meta - hvTotal}`;
+  document.getElementById('prog-hv-status').style.color = hvAtingida ? 'var(--purple)' : 'var(--amber)';
+  const hvBadge = document.getElementById('hv-badge');
+  hvBadge.textContent = hvAtingida ? '✅ Atingida' : `${hvTotal}/${METAS_CONFIG.happyvida.meta}`;
+  hvBadge.style.background = hvAtingida ? 'var(--purple-l)' : 'var(--amber-l)';
+  hvBadge.style.color = hvAtingida ? 'var(--purple)' : 'var(--amber)';
+
+  // ── Progresso CASSI ──
+  const cassiTotal = cassiData.length;
+  const pCassi = Math.min((cassiTotal / METAS_CONFIG.cassi.meta) * 100, 100);
+  const cassiAtingida = cassiTotal >= METAS_CONFIG.cassi.meta;
+  document.getElementById('prog-cassi-nums').textContent = `${cassiTotal} / ${METAS_CONFIG.cassi.meta}`;
+  document.getElementById('prog-cassi-fill').style.width = pCassi + '%';
+  document.getElementById('prog-cassi-status').textContent = cassiAtingida ? '✅ Meta atingida!' : `Faltam ${METAS_CONFIG.cassi.meta - cassiTotal}`;
+  document.getElementById('prog-cassi-status').style.color = cassiAtingida ? 'var(--teal)' : 'var(--amber)';
+  const cassiBadge = document.getElementById('cassi-badge');
+  cassiBadge.textContent = cassiAtingida ? '✅ Atingida' : `${cassiTotal}/${METAS_CONFIG.cassi.meta}`;
+  cassiBadge.style.background = cassiAtingida ? 'var(--teal-l)' : 'var(--amber-l)';
+  cassiBadge.style.color = cassiAtingida ? 'var(--teal)' : 'var(--amber)';
+
+  // ── Comissões por atendente ──
+  const atendentes = [...new Set(data.map(r => r.ATENDENTE || r._addedBy).filter(Boolean))].sort();
+  const comGrid = document.getElementById('comissao-grid');
+
+  if (!atendentes.length) {
+    comGrid.innerHTML = '<div class="meta-empty">Nenhum dado neste mês.</div>';
+    return;
+  }
+
+  const heroNome = ranking.length > 0 ? ranking[0][0] : null;
+
+  comGrid.innerHTML = atendentes.map(at => {
+    const u = users.find(x => x.name === at) || {};
+    const cor = u.color || '#1a5c3a';
+    const initials = at.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+    let total = 0;
+    let items = [];
+
+    // Prevent
+    if (maxAtingida) {
+      items.push({ label: 'Prevent (meta máxima)', val: METAS_CONFIG.prevent.comMax });
+      total += METAS_CONFIG.prevent.comMax;
+    } else if (minAtingida) {
+      items.push({ label: 'Prevent (meta mínima)', val: METAS_CONFIG.prevent.comMin });
+      total += METAS_CONFIG.prevent.comMin;
+    }
+
+    // Happy Vida
+    if (hvAtingida) {
+      items.push({ label: 'Happy Vida / Notre Dame', val: METAS_CONFIG.happyvida.com });
+      total += METAS_CONFIG.happyvida.com;
+    }
+
+    // CASSI
+    if (cassiAtingida) {
+      items.push({ label: 'CASSI', val: METAS_CONFIG.cassi.com });
+      total += METAS_CONFIG.cassi.com;
+    }
+
+    // Meta Herói
+    const isHero = at === heroNome && ranking.length > 0;
+    if (isHero) {
+      items.push({ label: '🏆 Meta Herói', val: METAS_CONFIG.heroi.premio, hero: true });
+      total += METAS_CONFIG.heroi.premio;
+    }
+
+    const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+
+    return `<div class="com-card">
+      <div class="com-card-name">
+        <div class="rank-av" style="background:${cor};width:24px;height:24px;font-size:9px">${initials}</div>
+        ${at}${isHero ? ' 🏆' : ''}
+      </div>
+      ${items.length ? items.map(i => `<div class="com-item"><span class="lbl">${i.label}</span><span class="val${i.hero ? ' green' : ''}" style="${i.hero ? 'color:var(--green)' : ''}">${fmt(i.val)}</span></div>`).join('') : '<div class="com-item"><span class="lbl" style="color:var(--ink3)">Nenhuma meta atingida ainda</span></div>'}
+      ${items.length ? `<div class="com-total"><span>Total estimado</span><span class="green">${fmt(total)}</span></div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════════

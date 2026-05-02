@@ -621,6 +621,49 @@ tr:hover td{background:var(--paper)}
     </div>
   </div>
 
+
+  <!-- METAS DE PRODUÇÃO — ProDoctor ao vivo -->
+  <div class="meta-card" style="margin-bottom:14px">
+    <div class="meta-card-header" style="background:linear-gradient(90deg,#0f3d26,#1a5c3a);color:#fff;border-radius:16px 16px 0 0">
+      <h2 style="color:#fff">📡 Metas de Produção — <span id="pd-mes-titulo">Mês atual</span> <span style="font-size:10px;font-weight:400;opacity:.7">(ProDoctor ao vivo)</span></h2>
+      <span id="pd-status" style="font-size:10px;color:rgba(255,255,255,.6);margin-left:auto">Carregando...</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--paper3)">
+      <!-- Testagens -->
+      <div style="padding:18px 16px;border-right:1px solid var(--paper3);text-align:center">
+        <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🧠 Testagens</div>
+        <div id="pd-testagens" style="font-size:36px;font-weight:700;color:var(--green);line-height:1;letter-spacing:-2px">—</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:4px">agendadas no mês</div>
+        <div style="margin-top:10px;height:6px;background:var(--paper2);border-radius:3px;overflow:hidden">
+          <div id="pd-bar-testagens" style="height:100%;background:var(--green);border-radius:3px;width:0%;transition:.5s"></div>
+        </div>
+      </div>
+      <!-- Entrega de Laudo -->
+      <div style="padding:18px 16px;border-right:1px solid var(--paper3);text-align:center">
+        <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">📋 Entrega de Laudo</div>
+        <div id="pd-laudos" style="font-size:36px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-2px">—</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:4px">agendadas no mês</div>
+        <div style="margin-top:10px;height:6px;background:var(--paper2);border-radius:3px;overflow:hidden">
+          <div id="pd-bar-laudos" style="height:100%;background:var(--blue);border-radius:3px;width:0%;transition:.5s"></div>
+        </div>
+      </div>
+      <!-- 1ª Consulta -->
+      <div style="padding:18px 16px;text-align:center">
+        <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🩺 1ª Consulta</div>
+        <div id="pd-primeiras" style="font-size:36px;font-weight:700;color:var(--purple);line-height:1;letter-spacing:-2px">—</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:4px">agendadas no mês</div>
+        <div style="margin-top:10px;height:6px;background:var(--paper2);border-radius:3px;overflow:hidden">
+          <div id="pd-bar-primeiras" style="height:100%;background:var(--purple);border-radius:3px;width:0%;transition:.5s"></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px 18px;display:flex;align-items:center;gap:16px">
+      <div style="font-size:12px;color:var(--ink3)">Total de procedimentos no mês:</div>
+      <div id="pd-total" style="font-size:20px;font-weight:700;color:var(--ink)">—</div>
+      <button onclick="limparCachePD()" style="margin-left:auto;font-family:inherit;font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid var(--paper3);background:var(--paper);cursor:pointer;color:var(--ink3)">🔄 Atualizar agora</button>
+    </div>
+  </div>
+
   <!-- Metas Happy Vida / Notre Dame e CASSI -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
     <div class="meta-card">
@@ -1241,420 +1284,4 @@ function saveRecord(){
   const date=document.getElementById('f-data').value,nome=document.getElementById('f-nome').value.trim(),plano=document.getElementById('f-plano').value;
   const cart=document.getElementById('f-cart').value.trim();
   const planoVal=document.getElementById('f-plano').value;
-  if(!date||!nome||!planoVal){toast('Preencha data, nome e plano.','error');return;}
-  if(!cart&&planoVal!=='Particular'){toast('Preencha a carteirinha do paciente.','error');return;}
-  // ── ANTI-DUPLICATA: bloqueia mesmo nome + mesma data ──
-  const nomeUp=nome.toUpperCase().trim();
-  const jaCadastrado=allData.some(r=>r.DATA===date&&r.NOME.trim()===nomeUp);
-  if(jaCadastrado){toast('\u26a0\ufe0f Paciente j\u00e1 lan\u00e7ado nesta data!','error');return;}
-  const rec={DATA:date,ATENDENTE:document.getElementById('f-at').value,NOME:nomeUp,PLANO:plano,
-    CARTEIRINHA:document.getElementById('f-cart').value,PROCEDIMENTO:document.getElementById('f-proc').value||'1ª CONSULTA',
-    TEM_SADT:document.getElementById('f-sadt').value,TELEFONE:document.getElementById('f-tel').value,
-    ORIGEM:document.getElementById('f-orig').value,_addedBy:curUser?.name||'?',_addedAt:new Date().toLocaleString('pt-BR')};
-  const[y,m]=date.split('-').map(Number);curYear=y;curMonth=m-1;viewYear=y;
-  const btnSalvar=document.querySelector('button[onclick="saveRecord()"]');
-  if(btnSalvar){btnSalvar.disabled=true;btnSalvar.textContent='Salvando...';}
-  allData.push(rec);addLog('Novo registro',`${nome} / ${plano} / ${date}`);saveAll();
-  sendToSheets(rec);
-  buildMonthChips();renderAll();
-  document.getElementById('f-nome').value='';document.getElementById('f-cart').value='';document.getElementById('f-tel').value='';
-  toast('Ligação salva!','success');showView('acompanhamento');
-  setTimeout(()=>{if(btnSalvar){btnSalvar.disabled=false;btnSalvar.textContent='Salvar ligação';}},3000);
-}
-
-// ═══════════════════════════════════════════════════════════
-// ADMIN PANEL
-// ═══════════════════════════════════════════════════════════
-function renderAdmin(){
-  if(curUser?.role!=='Admin')return;
-  // Users list
-  document.getElementById('users-list').innerHTML=users.filter(u=>u.id!=='admin').map(u=>`
-    <div class="user-card">
-      <div class="uc-av" style="background:${u.color}">${u.name.slice(0,2).toUpperCase()}</div>
-      <div class="uc-info">
-        <div class="uc-name">${u.name}</div>
-        <div class="uc-email">${u.email||'<span style="color:var(--amber)">⚠ Email não cadastrado</span>'}</div>
-        <div class="uc-role">${u.role}${u.firstAccess?' · <span style="color:var(--amber)">Aguardando 1º acesso</span>':' · Ativo'}</div>
-      </div>
-      <div class="uc-status ${u.active?'status-active':'status-inactive'}" title="${u.active?'Ativo':'Inativo'}"></div>
-      <div class="uc-actions">
-        <button class="ic-btn" onclick="editUserEmail('${u.id}')" title="Editar email">✏ Email</button>
-        <button class="ic-btn" onclick="resetUserPwd('${u.id}')" title="Redefinir senha">🔑 Senha</button>
-        <button class="ic-btn ${u.active?'danger':''}" onclick="toggleUser('${u.id}')">${u.active?'Desativar':'Ativar'}</button>
-      </div>
-    </div>`).join('');
-  // Recoveries
-  const pending=recoveries.filter(r=>!r.used&&r.expires>Date.now());
-  document.getElementById('recovery-count').textContent=pending.length;
-  document.getElementById('recovery-list').innerHTML=pending.length?
-    pending.map(r=>`<div style="background:var(--amber-l);border:1px solid #f0d88a;border-radius:10px;padding:12px 14px;margin-bottom:8px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div style="font-weight:600;font-size:13px">${r.userName}</div>
-        <span style="font-size:11px;color:var(--ink3)">${r.requestedAt}</span>
-      </div>
-      <div style="font-size:12px;color:var(--ink3);margin-bottom:8px">${r.email}</div>
-      <div style="background:var(--white);border:1px solid #f0d88a;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:11px;color:var(--amber);font-weight:500">Código a repassar:</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--amber);letter-spacing:4px">${r.code}</span>
-      </div>
-      <div style="font-size:10px;color:var(--ink3);margin-top:6px">Repasse este código APENAS para ${r.userName} pelo WhatsApp ou pessoalmente. Válido por 24h.</div>
-    </div>`).join('')
-    :'<p style="font-size:12px;color:var(--ink3)">Nenhuma solicitação pendente.</p>';
-  // Log
-  document.getElementById('log-count').textContent=actLog.length;
-  document.getElementById('log-tbody').innerHTML=[...actLog].reverse().slice(0,80).map(l=>
-    `<tr><td style="font-size:11px;color:var(--ink3);white-space:nowrap">${l.ts}</td><td style="font-weight:500">${l.user}</td><td>${l.action}</td><td style="color:var(--ink3)">${l.detail}</td></tr>`
-  ).join('');
-}
-
-function showAddUser(){document.getElementById('add-user-panel').style.display='block';}
-function addUser(){
-  const nome=document.getElementById('nu-nome').value.trim();
-  const email=document.getElementById('nu-email').value.trim().toLowerCase();
-  const role=document.getElementById('nu-role').value;
-  const cor=document.getElementById('nu-cor').value;
-  const pwd=document.getElementById('nu-pwd').value;
-  if(!nome||!email){toast('Preencha nome e email.','error');return;}
-  if(!pwd||pwd.length<6){toast('Senha provisória: mínimo 6 caracteres.','error');return;}
-  if(users.find(u=>u.email.toLowerCase()===email)){toast('Este email já está cadastrado.','error');return;}
-  const id=nome.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();
-  users.push({id,name:nome,email,role,color:cor,pwdHash:hashPwd(pwd),firstAccess:true,active:true});
-  addLog('Novo usuário',`${nome} (${email}) adicionado como ${role}`);saveAll();
-  document.getElementById('nu-nome').value='';document.getElementById('nu-email').value='';document.getElementById('nu-pwd').value='';
-  document.getElementById('add-user-panel').style.display='none';
-  populateAtSelect();renderAdmin();toast(`${nome} adicionado! Ela deve fazer 1º acesso para definir a senha.`,'success');
-}
-function editUserEmail(id){
-  const u=users.find(x=>x.id===id);if(!u)return;
-  const novo=prompt(`Email atual de ${u.name}: ${u.email||'(vazio)'}
-
-Novo email:`,u.email);
-  if(novo===null)return;
-  if(!novo.includes('@')){toast('Email inválido.','error');return;}
-  const old=u.email;u.email=novo.trim().toLowerCase();
-  addLog('Email editado',`${u.name}: ${old} → ${u.email}`);saveAll();renderAdmin();toast('Email atualizado!','success');
-}
-function resetUserPwd(id){
-  const u=users.find(x=>x.id===id);if(!u)return;
-  const nova=prompt(`Definir nova senha provisória para ${u.name}:
-(Ela deverá trocar no próximo acesso)`);
-  if(!nova)return;
-  if(nova.length<6){toast('Senha precisa ter ao menos 6 caracteres.','error');return;}
-  u.pwdHash=hashPwd(nova);u.firstAccess=true;
-  addLog('Reset de senha',`Senha provisória definida para ${u.name}`);saveAll();renderAdmin();
-  toast(`Senha de ${u.name} redefinida. Repasse a nova senha para ela.`,'success');
-}
-function toggleUser(id){
-  const u=users.find(x=>x.id===id);if(!u)return;
-  u.active=!u.active;addLog(u.active?'Usuário ativado':'Usuário desativado',u.name);saveAll();renderAdmin();
-  toast(u.active?`${u.name} ativada.`:`${u.name} desativada.`,u.active?'success':'error');
-}
-
-// ═══════════════════════════════════════════════════════════
-// EXPORTS
-// ═══════════════════════════════════════════════════════════
-function exportCSV(type){
-  const todayStr=TODAY_STR;
-  const data=type==='day'?allData.filter(r=>r.DATA===todayStr):monthData(curYear,curMonth);
-  if(!data.length){toast('Sem dados para exportar.','error');return;}
-  const header=['DATA','ATENDENTE','NOME','PLANO','CARTEIRINHA','PROCEDIMENTO','TEM_SADT','TELEFONE','ORIGEM','REGISTRADO_POR'];
-  const rows=data.map(r=>header.map(k=>`"${(r[k]||r['_addedBy']||'').toString().replace(/"/g,'""')}"`).join(','));
-  const csv=[header.join(','),...rows].join('\n');
-  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`neuro_${type==='day'?todayStr:monthKey(curYear,curMonth)}.csv`;a.click();
-  addLog('Export CSV',`${type} / ${data.length} registros`);toast('CSV exportado!','success');
-}
-function exportPDF(type){
-  const todayStr=TODAY_STR;
-  const data=type==='day'?allData.filter(r=>r.DATA===todayStr):monthData(curYear,curMonth);
-  const title=type==='day'?`Relatório Diário — ${TODAY_DATE.toLocaleDateString('pt-BR')}`:`Relatório Mensal — ${monthLabel(curYear,curMonth)}`;
-  if(!data.length){toast('Sem dados para exportar.','error');return;}
-  const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  doc.setFillColor(15,14,12);doc.rect(0,0,297,18,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(12);doc.setFont(undefined,'bold');
-  doc.text('Neuroavaliação — Controle de Agendamentos',14,11);
-  doc.setFontSize(9);doc.setFont(undefined,'normal');doc.text(title,14,17);
-  const conv=data.filter(isConv).length,part=data.filter(isPart).length;
-  let xS=14;const stats=[`Total: ${data.length}`,`Convênio: ${conv}`,`Particular: ${part}`];
-  const sColors=[[26,92,58],[26,63,107],[120,78,0]];
-  stats.forEach((s,i)=>{doc.setFillColor(...sColors[i]);doc.rect(xS,21,45,9,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.text(s,xS+2,27);xS+=48;});
-  // Plano breakdown
-  let yP=35;const planos=[...new Set(data.map(r=>r.PLANO))].sort();
-  planos.forEach((p,i)=>{const n=data.filter(r=>r.PLANO===p).length;
-    doc.setFillColor(244,242,238);doc.rect(14+i*52,yP,50,7,'F');doc.setTextColor(60,60,60);doc.setFontSize(8);doc.text(`${p}: ${n}`,14+i*52+2,yP+4.5);});
-  yP+=12;
-  const cols=['Data','Atendente','Paciente','Plano','Carteirinha','SADT','Origem','Reg. por'];
-  const cW=[20,24,65,22,28,12,28,24];
-  doc.setFillColor(26,92,58);let xc=14;
-  cols.forEach((c,i)=>{doc.rect(xc,yP,cW[i],7,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.text(c,xc+1.5,yP+4.5);xc+=cW[i];});yP+=7;
-  data.forEach((r,idx)=>{
-    if(yP>190){doc.addPage();yP=14;xc=14;cols.forEach((c,i)=>{doc.setFillColor(26,92,58);doc.rect(xc,yP,cW[i],7,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.text(c,xc+1.5,yP+4.5);xc+=cW[i];});yP+=7;}
-    idx%2===0?doc.setFillColor(244,242,238):doc.setFillColor(255,255,255);
-    xc=14;const vals=[r.DATA.slice(8)+'/'+r.DATA.slice(5,7),r.ATENDENTE||'—',r.NOME.slice(0,38),r.PLANO,r.CARTEIRINHA||'—',r.TEM_SADT,r.ORIGEM,r._addedBy||'—'];
-    vals.forEach((v,i)=>{doc.rect(xc,yP,cW[i],6,'F');doc.setTextColor(15,14,12);doc.setFontSize(7);doc.setFont(undefined,'normal');doc.text(String(v).slice(0,28),xc+1.5,yP+4);xc+=cW[i];});yP+=6;
-  });
-  doc.setFontSize(7);doc.setTextColor(150,150,150);
-  doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')} por ${curUser?.name||'—'}`,14,205);
-  doc.save(`neuro_${type==='day'?todayStr:monthKey(curYear,curMonth)}.pdf`);
-  addLog('Export PDF',`${type} / ${data.length} registros`);toast('PDF exportado!','success');
-}
-
-// ═══════════════════════════════════════════════════════════
-// NAV + UTILS
-// ═══════════════════════════════════════════════════════════
-function showView(v){
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.getElementById('view-'+v).classList.add('active');
-  document.querySelectorAll('.h-nav button').forEach(b=>b.classList.remove('active'));
-  const map={dashboard:0,acompanhamento:1,registros:2,atendentes:3,nova:4,admin:5,metas:6};
-  const btns=document.querySelectorAll('.h-nav button');if(btns[map[v]])btns[map[v]].classList.add('active');
-  if(v==='atendentes')renderAtendentes(monthData(curYear,curMonth));
-  if(v==='admin')renderAdmin();
-  if(v==='metas')renderMetas();
-}
-function toast(msg,type='success'){
-  const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3500);
-}
-
-
-
-// ═══════════════════════════════════════════════════════════
-// INTEGRAÇÃO PRODOCOR
-// ═══════════════════════════════════════════════════════════
-const PRODOCOR_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFjC5joHY6rVZ3mG1OvREuiO3zlh75q8LhhhQ5s2boDOb6CNC1IqFgsGq9L4ttQApU/exec';
-
-let prodoctorCache = {};
-
-function buscarAtendimentosProDoctor(ano, mes, callback) {
-  const key = ano + '-' + mes;
-  if (prodoctorCache[key]) { callback(prodoctorCache[key]); return; }
-
-  const mesFormatado = String(mes + 1).padStart(2, '0');
-  const url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mesFormatado;
-
-  fetch(url)
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      prodoctorCache[key] = data;
-      callback(data);
-    })
-    .catch(function(err) {
-      console.error('Erro ProDoctor:', err);
-      callback(null);
-    });
-}
-
-// ═══════════════════════════════════════════════════════════
-// METAS E COMISSÕES
-// ═══════════════════════════════════════════════════════════
-
-// Configuração das metas
-const METAS_CONFIG = {
-  prevent: { min: 1413, max: 1570, comMin: 300, comMax: 500 },
-  happyvida: { meta: 20, com: 50 },
-  cassi: { meta: 20, com: 50 },
-  heroi: { premio: 300 }
-};
-
-function renderMetas() {
-  const data = monthData(curYear, curMonth);
-  // Buscar dados reais do ProDoctor para Prevent
-  buscarAtendimentosProDoctor(curYear, curMonth, function(pdData) {
-    renderMetasComProDoctor(data, pdData);
-  });
-}
-
-function renderMetasComProDoctor(data, pdData) {
-  const mesLabel = monthLabel(curYear, curMonth);
-
-  // Labels
-  document.getElementById('rank-mes-lbl').textContent = mesLabel;
-  document.getElementById('com-mes-lbl').textContent = mesLabel;
-
-  // ── Dados por plano ──
-  const preventData = data.filter(r => r.PLANO === 'Prevent');
-  // Usar dados reais do ProDoctor se disponível
-  const prevTotal = pdData ? pdData.prevent : preventData.length;
-  const prevTotalLabel = pdData ? '(ProDoctor ao vivo)' : '(agendamentos)';
-  const happyData   = data.filter(r => r.PLANO === 'Notre Dame');
-  const cassiData   = data.filter(r => r.PLANO === 'CASSI');
-  const convData    = data.filter(r => isConv(r));
-
-  // ── Ranking de convênios por atendente ──
-  const rankMap = {};
-  convData.forEach(r => {
-    const at = r.ATENDENTE || r._addedBy || '?';
-    rankMap[at] = (rankMap[at] || 0) + 1;
-  });
-  const ranking = Object.entries(rankMap).sort((a,b) => b[1]-a[1]);
-
-  // Render ranking table
-  const tbody = document.querySelector('#ranking-conv-tbody tbody');
-  if (!tbody) return;
-  if (!ranking.length) {
-    tbody.innerHTML = '<tr><td colspan="4" class="meta-empty">Nenhum agendamento de convênio neste mês.</td></tr>';
-  } else {
-    const medals = ['🥇','🥈','🥉'];
-    tbody.innerHTML = ranking.map(([nome, total], i) => {
-      const u = users.find(x => x.name === nome) || {};
-      const cor = u.color || AT_COLORS[i % AT_COLORS.length];
-      const initials = nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      return `<tr>
-        <td class="rank-pos">${medals[i] || (i+1)}</td>
-        <td><div class="rank-av" style="background:${cor}">${initials}</div></td>
-        <td><div class="rank-name">${nome}</div></td>
-        <td><div class="rank-count" style="color:var(--green)">${total}</div><div class="rank-sub">convênios</div></td>
-      </tr>`;
-    }).join('');
-  }
-
-  // ── Meta Herói ──
-  const heroPanel = document.getElementById('hero-winner');
-  if (ranking.length > 0) {
-    const [heroNome, heroTotal] = ranking[0];
-    const u = users.find(x => x.name === heroNome) || {};
-    const cor = u.color || '#1a5c3a';
-    const initials = heroNome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    heroPanel.innerHTML = `
-      <div class="meta-hero-av" style="background:${cor}">${initials}</div>
-      <div class="meta-hero-info">
-        <div class="meta-hero-name">${heroNome}</div>
-        <div class="meta-hero-count">${heroTotal} agendamentos de convênio no mês</div>
-      </div>
-      <div class="meta-hero-prize">🏆 + R$ ${METAS_CONFIG.heroi.premio.toFixed(2).replace('.',',')}</div>
-    `;
-  } else {
-    heroPanel.innerHTML = '<div style="font-size:13px;color:rgba(255,255,255,.6)">Nenhum agendamento de convênio neste mês ainda.</div>';
-  }
-
-  // ── Progresso Prevent ──
-  // prevTotal já definido acima
-  const pMin = Math.min((prevTotal / METAS_CONFIG.prevent.min) * 100, 100);
-  const pMax = Math.min((prevTotal / METAS_CONFIG.prevent.max) * 100, 100);
-
-  document.getElementById('prog-min-nums').textContent = prevTotal + ' / ' + METAS_CONFIG.prevent.min + ' ' + prevTotalLabel;
-  document.getElementById('prog-max-nums').textContent = prevTotal + ' / ' + METAS_CONFIG.prevent.max + ' ' + prevTotalLabel;
-  document.getElementById('prog-min-fill').style.width = pMin + '%';
-  document.getElementById('prog-max-fill').style.width = pMax + '%';
-
-  const minAtingida = prevTotal >= METAS_CONFIG.prevent.min;
-  const maxAtingida = prevTotal >= METAS_CONFIG.prevent.max;
-  const faltaMin = Math.max(0, METAS_CONFIG.prevent.min - prevTotal);
-  const faltaMax = Math.max(0, METAS_CONFIG.prevent.max - prevTotal);
-
-  document.getElementById('prog-min-status').textContent = minAtingida ? '✅ Meta atingida!' : `Faltam ${faltaMin} atendimentos`;
-  document.getElementById('prog-min-status').style.color = minAtingida ? 'var(--green)' : 'var(--amber)';
-  document.getElementById('prog-max-status').textContent = maxAtingida ? '✅ Meta atingida!' : `Faltam ${faltaMax} atendimentos`;
-  document.getElementById('prog-max-status').style.color = maxAtingida ? 'var(--blue)' : 'var(--amber)';
-
-  const preventBadge = document.getElementById('prevent-status-badge');
-  if (maxAtingida) { preventBadge.textContent = '✅ Meta Máxima'; preventBadge.style.background='var(--blue-l)'; preventBadge.style.color='var(--blue)'; }
-  else if (minAtingida) { preventBadge.textContent = '✅ Meta Mínima'; preventBadge.style.background='var(--green-l)'; preventBadge.style.color='var(--green)'; }
-  else { preventBadge.textContent = `${prevTotal}/${METAS_CONFIG.prevent.min}`; preventBadge.style.background='var(--amber-l)'; preventBadge.style.color='var(--amber)'; }
-
-  // ── Progresso Happy Vida / Notre Dame ──
-  const hvTotal = happyData.length;
-  const pHv = Math.min((hvTotal / METAS_CONFIG.happyvida.meta) * 100, 100);
-  const hvAtingida = hvTotal >= METAS_CONFIG.happyvida.meta;
-  document.getElementById('prog-hv-nums').textContent = `${hvTotal} / ${METAS_CONFIG.happyvida.meta}`;
-  document.getElementById('prog-hv-fill').style.width = pHv + '%';
-  document.getElementById('prog-hv-status').textContent = hvAtingida ? '✅ Meta atingida!' : `Faltam ${METAS_CONFIG.happyvida.meta - hvTotal}`;
-  document.getElementById('prog-hv-status').style.color = hvAtingida ? 'var(--purple)' : 'var(--amber)';
-  const hvBadge = document.getElementById('hv-badge');
-  hvBadge.textContent = hvAtingida ? '✅ Atingida' : `${hvTotal}/${METAS_CONFIG.happyvida.meta}`;
-  hvBadge.style.background = hvAtingida ? 'var(--purple-l)' : 'var(--amber-l)';
-  hvBadge.style.color = hvAtingida ? 'var(--purple)' : 'var(--amber)';
-
-  // ── Progresso CASSI ──
-  const cassiTotal = cassiData.length;
-  const pCassi = Math.min((cassiTotal / METAS_CONFIG.cassi.meta) * 100, 100);
-  const cassiAtingida = cassiTotal >= METAS_CONFIG.cassi.meta;
-  document.getElementById('prog-cassi-nums').textContent = `${cassiTotal} / ${METAS_CONFIG.cassi.meta}`;
-  document.getElementById('prog-cassi-fill').style.width = pCassi + '%';
-  document.getElementById('prog-cassi-status').textContent = cassiAtingida ? '✅ Meta atingida!' : `Faltam ${METAS_CONFIG.cassi.meta - cassiTotal}`;
-  document.getElementById('prog-cassi-status').style.color = cassiAtingida ? 'var(--teal)' : 'var(--amber)';
-  const cassiBadge = document.getElementById('cassi-badge');
-  cassiBadge.textContent = cassiAtingida ? '✅ Atingida' : `${cassiTotal}/${METAS_CONFIG.cassi.meta}`;
-  cassiBadge.style.background = cassiAtingida ? 'var(--teal-l)' : 'var(--amber-l)';
-  cassiBadge.style.color = cassiAtingida ? 'var(--teal)' : 'var(--amber)';
-
-  // ── Comissões por atendente ──
-  const atendentes = [...new Set(data.map(r => r.ATENDENTE || r._addedBy).filter(Boolean))].sort();
-  const comGrid = document.getElementById('comissao-grid');
-
-  if (!atendentes.length) {
-    comGrid.innerHTML = '<div class="meta-empty">Nenhum dado neste mês.</div>';
-    return;
-  }
-
-  const heroNome = ranking.length > 0 ? ranking[0][0] : null;
-
-  comGrid.innerHTML = atendentes.map(at => {
-    const u = users.find(x => x.name === at) || {};
-    const cor = u.color || '#1a5c3a';
-    const initials = at.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-
-    let total = 0;
-    let items = [];
-
-    // Prevent
-    if (maxAtingida) {
-      items.push({ label: 'Prevent (meta máxima)', val: METAS_CONFIG.prevent.comMax });
-      total += METAS_CONFIG.prevent.comMax;
-    } else if (minAtingida) {
-      items.push({ label: 'Prevent (meta mínima)', val: METAS_CONFIG.prevent.comMin });
-      total += METAS_CONFIG.prevent.comMin;
-    }
-
-    // Happy Vida
-    if (hvAtingida) {
-      items.push({ label: 'Happy Vida / Notre Dame', val: METAS_CONFIG.happyvida.com });
-      total += METAS_CONFIG.happyvida.com;
-    }
-
-    // CASSI
-    if (cassiAtingida) {
-      items.push({ label: 'CASSI', val: METAS_CONFIG.cassi.com });
-      total += METAS_CONFIG.cassi.com;
-    }
-
-    // Meta Herói
-    const isHero = at === heroNome && ranking.length > 0;
-    if (isHero) {
-      items.push({ label: '🏆 Meta Herói', val: METAS_CONFIG.heroi.premio, hero: true });
-      total += METAS_CONFIG.heroi.premio;
-    }
-
-    const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',');
-
-    return `<div class="com-card">
-      <div class="com-card-name">
-        <div class="rank-av" style="background:${cor};width:24px;height:24px;font-size:9px">${initials}</div>
-        ${at}${isHero ? ' 🏆' : ''}
-      </div>
-      ${items.length ? items.map(i => `<div class="com-item"><span class="lbl">${i.label}</span><span class="val${i.hero ? ' green' : ''}" style="${i.hero ? 'color:var(--green)' : ''}">${fmt(i.val)}</span></div>`).join('') : '<div class="com-item"><span class="lbl" style="color:var(--ink3)">Nenhuma meta atingida ainda</span></div>'}
-      ${items.length ? `<div class="com-total"><span>Total estimado</span><span class="green">${fmt(total)}</span></div>` : ''}
-    </div>`;
-  }).join('');
-}
-
-// ═══════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════
-// Clear old storage versions to prevent stale data
-// Wipe ALL old versions
-try{
-  const keysToRemove=[];
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&(k.startsWith('neuro_')&&!k.endsWith('_v5'))){keysToRemove.push(k);}
-  }
-  keysToRemove.forEach(k=>localStorage.removeItem(k));
-}catch(e){}
-document.getElementById('f-data').value=TODAY_STR;
-loadAll();
-</script>
-</body>
-</html>
+  if(!date||!nome||!planoVal){toast('Preencha data, nome e plano.','error')

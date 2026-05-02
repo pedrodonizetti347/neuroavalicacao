@@ -145,11 +145,11 @@ body.admin-mode .h-nav button.admin-only{display:inline-block}
 /* ── STATS ── */
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-bottom:16px}
 .stat{background:var(--white);border:1px solid var(--paper3);border-radius:10px;padding:12px 14px}
-.stat .sl{font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.stat .sv{font-size:24px;font-weight:700;line-height:1;letter-spacing:-1px}
-.stat .ss{font-size:11px;color:var(--ink3);margin-top:3px}
-.stat.g{background:var(--green);border-color:var(--green)}.stat.g .sl,.stat.g .ss{color:rgba(255,255,255,.6)}.stat.g .sv{color:#fff}
-.stat.b{background:var(--blue);border-color:var(--blue)}.stat.b .sl,.stat.b .ss{color:rgba(255,255,255,.6)}.stat.b .sv{color:#fff}
+.stat .sl{font-size:10px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat .sv{font-size:24px;font-weight:700;line-height:1;letter-spacing:-1px;color:var(--ink)}
+.stat .ss{font-size:11px;color:var(--ink2);margin-top:3px}
+.stat.g{background:var(--green);border-color:var(--green)}.stat.g .sl,.stat.g .ss{color:rgba(255,255,255,.75)}.stat.g .sv{color:#fff}
+.stat.b{background:var(--blue);border-color:var(--blue)}.stat.b .sl,.stat.b .ss{color:rgba(255,255,255,.75)}.stat.b .sv{color:#fff}
 
 /* ── PANELS ── */
 .panel{background:var(--white);border:1px solid var(--paper3);border-radius:16px;overflow:hidden;margin-bottom:14px}
@@ -182,9 +182,9 @@ tr:hover td{background:var(--paper)}
 /* ── BAR CHART ── */
 .bar-chart{display:flex;align-items:flex-end;gap:3px;height:80px;padding:4px 0}
 .bday{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:20px}
-.bday .bv{font-size:9px;color:var(--ink3)}
+.bday .bv{font-size:9px;color:var(--ink2)}
 .bday .bb{width:100%;border-radius:2px 2px 0 0}
-.bday .bd{font-size:8px;color:var(--ink3)}
+.bday .bd{font-size:8px;color:var(--ink2)}
 
 /* ── ATENDENTES ── */
 .at-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--paper3)}
@@ -595,7 +595,7 @@ tr:hover td{background:var(--paper)}
     <!-- Tabela -->
     <div style="overflow-x:auto;max-height:420px;overflow-y:auto">
       <table id="rel-table" style="display:none"><thead><tr>
-        <th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Convênio</th><th>Procedimento</th><th>Tipo</th>
+        <th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th>
       </tr></thead><tbody id="rel-tbody"></tbody></table>
       <div id="rel-empty" style="padding:32px;text-align:center;color:var(--ink3);font-size:13px">Clique em Buscar para carregar os atendimentos do ProDoctor.</div>
     </div>
@@ -1777,10 +1777,19 @@ async function buscarRelatorio() {
       profissionais.map(p => `<option value="${p}">${p}</option>`).join('');
     if (prof) relProf.value = prof;
 
-    relatorioCache = detalhes;
+    // ── DEDUP: mesmo profissional + mesmo paciente + mesma data → mantém apenas 1 ──
+    const seenRel = new Set();
+    const deduped = detalhes.filter(d => {
+      const key = (d.profissional||'') + '||' + (d.paciente||'').trim().toUpperCase() + '||' + (d.data||'');
+      if (seenRel.has(key)) return false;
+      seenRel.add(key);
+      return true;
+    });
+    relatorioCache = deduped;
     filtrarRelatorio();
 
-    document.getElementById('rel-status').textContent = '✅ Atualizado — ' + detalhes.length + ' atendimentos encontrados';
+    const removidosDup = detalhes.length - deduped.length;
+    document.getElementById('rel-status').textContent = '✅ Atualizado — ' + deduped.length + ' atendimentos' + (removidosDup > 0 ? ' (' + removidosDup + ' duplicatas removidas)' : '');
     document.getElementById('rel-btn-csv').style.display = 'inline-block';
     document.getElementById('rel-btn-pdf').style.display = 'inline-block';
 
@@ -1835,7 +1844,6 @@ function filtrarRelatorio() {
     <td style="white-space:nowrap">${d.hora || '—'}</td>
     <td style="font-weight:500">${d.profissional || '—'}</td>
     <td>${d.paciente || '—'}</td>
-    <td style="font-size:11px">${d.convenio || '—'}</td>
     <td style="font-size:11px">${d.procedimento || '—'}</td>
     <td><span style="font-size:11px;font-weight:600;color:${TIPO_COLOR[d.tipo] || 'var(--ink3)'}">${TIPO_LABEL[d.tipo] || d.tipo}</span></td>
   </tr>`).join('');
@@ -1845,9 +1853,9 @@ function filtrarRelatorio() {
 
 function exportarRelatorioCSV() {
   if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
-  const header = 'Data,Hora,Profissional,Paciente,Convenio,Procedimento,Tipo';
+  const header = 'Data,Hora,Profissional,Paciente,Procedimento,Tipo';
   const rows = relatorioFiltrado.map(d =>
-    [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.convenio||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo]
+    [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo]
     .map(function(v){ return '"' + String(v).replace(/"/g,'""')+'"'; }).join(',')
   );
   const csv = '\uFEFF' + header + '\n' + rows.join('\n');
@@ -1877,7 +1885,6 @@ function exportarRelatorioPDF() {
       <td>${d.hora||'—'}</td>
       <td><strong>${d.profissional||'—'}</strong></td>
       <td>${d.paciente||'—'}</td>
-      <td style="font-size:11px">${d.convenio||'—'}</td>
       <td style="font-size:11px">${d.procedimento||'—'}</td>
       <td style="font-size:11px;font-weight:600">${TIPO_LABEL[d.tipo]||d.tipo}</td>
     </tr>`).join('');
@@ -1898,7 +1905,7 @@ function exportarRelatorioPDF() {
   <div class="sub">${mesNome}/${ano} · ${prof} · Total: ${relatorioFiltrado.length} atendimentos</div>
   <div class="resumo">${resumo}</div>
   <table>
-    <thead><tr><th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Convênio</th><th>Procedimento</th><th>Tipo</th></tr></thead>
+    <thead><tr><th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th></tr></thead>
     <tbody>${linhasHTML}</tbody>
   </table>
   <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')} · Sistema Neuroavaliação Agendamento</div>

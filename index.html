@@ -1419,6 +1419,33 @@ function toast(msg,type='success'){
 }
 
 
+
+// ═══════════════════════════════════════════════════════════
+// INTEGRAÇÃO PRODOCOR
+// ═══════════════════════════════════════════════════════════
+const PRODOCOR_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFjC5joHY6rVZ3mG1OvREuiO3zlh75q8LhhhQ5s2boDOb6CNC1IqFgsGq9L4ttQApU/exec';
+
+let prodoctorCache = {};
+
+function buscarAtendimentosProDoctor(ano, mes, callback) {
+  const key = ano + '-' + mes;
+  if (prodoctorCache[key]) { callback(prodoctorCache[key]); return; }
+
+  const mesFormatado = String(mes + 1).padStart(2, '0');
+  const url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mesFormatado;
+
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      prodoctorCache[key] = data;
+      callback(data);
+    })
+    .catch(function(err) {
+      console.error('Erro ProDoctor:', err);
+      callback(null);
+    });
+}
+
 // ═══════════════════════════════════════════════════════════
 // METAS E COMISSÕES
 // ═══════════════════════════════════════════════════════════
@@ -1433,6 +1460,13 @@ const METAS_CONFIG = {
 
 function renderMetas() {
   const data = monthData(curYear, curMonth);
+  // Buscar dados reais do ProDoctor para Prevent
+  buscarAtendimentosProDoctor(curYear, curMonth, function(pdData) {
+    renderMetasComProDoctor(data, pdData);
+  });
+}
+
+function renderMetasComProDoctor(data, pdData) {
   const mesLabel = monthLabel(curYear, curMonth);
 
   // Labels
@@ -1441,6 +1475,9 @@ function renderMetas() {
 
   // ── Dados por plano ──
   const preventData = data.filter(r => r.PLANO === 'Prevent');
+  // Usar dados reais do ProDoctor se disponível
+  const prevTotal = pdData ? pdData.prevent : preventData.length;
+  const prevTotalLabel = pdData ? '(ProDoctor ao vivo)' : '(agendamentos)';
   const happyData   = data.filter(r => r.PLANO === 'Notre Dame');
   const cassiData   = data.filter(r => r.PLANO === 'CASSI');
   const convData    = data.filter(r => isConv(r));
@@ -1493,12 +1530,12 @@ function renderMetas() {
   }
 
   // ── Progresso Prevent ──
-  const prevTotal = preventData.length;
+  // prevTotal já definido acima
   const pMin = Math.min((prevTotal / METAS_CONFIG.prevent.min) * 100, 100);
   const pMax = Math.min((prevTotal / METAS_CONFIG.prevent.max) * 100, 100);
 
-  document.getElementById('prog-min-nums').textContent = `${prevTotal} / ${METAS_CONFIG.prevent.min}`;
-  document.getElementById('prog-max-nums').textContent = `${prevTotal} / ${METAS_CONFIG.prevent.max}`;
+  document.getElementById('prog-min-nums').textContent = prevTotal + ' / ' + METAS_CONFIG.prevent.min + ' ' + prevTotalLabel;
+  document.getElementById('prog-max-nums').textContent = prevTotal + ' / ' + METAS_CONFIG.prevent.max + ' ' + prevTotalLabel;
   document.getElementById('prog-min-fill').style.width = pMin + '%';
   document.getElementById('prog-max-fill').style.width = pMax + '%';
 

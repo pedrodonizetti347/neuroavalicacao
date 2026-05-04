@@ -1934,7 +1934,7 @@ function filtrarRelatorio() {
     const btnConf = isComp
       ? (jaConferido
           ? `<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>`
-          : `<button onclick="conferirAtendimento('${confKey}', this)" style="font-family:inherit;font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid #9fd0b5;background:#e4f0e9;color:#1a5c3a;cursor:pointer">✓ Conferir</button>`)
+          : `<button onclick="conferirPorIndice(${i}, this)" style="font-family:inherit;font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid #9fd0b5;background:#e4f0e9;color:#1a5c3a;cursor:pointer">✓ Conferir</button>`)
       : '—';
     return `<tr style="${rowBg}">
     <td style="white-space:nowrap">${d.data || '—'}</td>
@@ -1990,6 +1990,18 @@ function conferidoSet(key) {
 }
 
 function conferirAtendimento(key, btn) {
+  conferidoSet(key);
+  const td = btn.parentElement;
+  td.innerHTML = '<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>';
+  const tr = td.parentElement;
+  tr.style.background = '#f0faf4';
+  toast('Conferido! ✓', 'success');
+}
+
+function conferirPorIndice(idx, btn) {
+  const d = relatorioFiltrado[idx];
+  if (!d) return;
+  const key = conferidoKey(d);
   conferidoSet(key);
   const td = btn.parentElement;
   td.innerHTML = '<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>';

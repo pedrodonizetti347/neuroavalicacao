@@ -235,13 +235,11 @@ tr:hover td{background:var(--paper)}
 .toast.success{background:var(--green)}.toast.error{background:var(--red)}
 
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--paper3);border-radius:4px}
-
 /* ── PRODUÇÃO ── */
 .prod-hero{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .prod-placar{border-radius:16px;padding:22px 24px;color:#fff;position:relative;overflow:hidden}
 .prod-placar.hoje{background:linear-gradient(135deg,#1a3f6b 0%,#0f2a47 100%)}
 .prod-placar.mes{background:linear-gradient(135deg,#1a5c3a 0%,#0f3d26 100%)}
-.prod-placar::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)}
 .prod-placar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.6);margin-bottom:6px}
 .prod-placar-num{font-size:52px;font-weight:700;line-height:1;letter-spacing:-2px}
 .prod-placar-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:6px}
@@ -251,9 +249,7 @@ tr:hover td{background:var(--paper)}
 .prod-rank-item:last-child{border-bottom:none}
 .prod-rank-item:hover{background:var(--paper)}
 .prod-rank-pos{font-size:16px;font-weight:700;width:28px;text-align:center;color:var(--ink3)}
-.prod-rank-pos.gold{color:#f59e0b}
-.prod-rank-pos.silver{color:#6b7280}
-.prod-rank-pos.bronze{color:#92400e}
+.prod-rank-pos.gold{color:#f59e0b}.prod-rank-pos.silver{color:#6b7280}.prod-rank-pos.bronze{color:#92400e}
 .prod-rank-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
 .prod-rank-info{flex:1}
 .prod-rank-name{font-size:13px;font-weight:600}
@@ -650,42 +646,6 @@ tr:hover td{background:var(--paper)}
 </div>
 
 
-<!-- PRODUÇÃO — Painel ao vivo para todos -->
-<div class="view" id="view-producao">
-  <div class="prod-hero">
-    <div class="prod-placar hoje">
-      <span class="prod-placar-badge">🔴 AO VIVO</span>
-      <div class="prod-placar-label">Compareceram hoje</div>
-      <div class="prod-placar-num" id="prod-hoje-num">—</div>
-      <div class="prod-placar-sub" id="prod-hoje-sub">Carregando...</div>
-    </div>
-    <div class="prod-placar mes">
-      <span class="prod-placar-badge">📅 MÊS</span>
-      <div class="prod-placar-label">Compareceram no mês</div>
-      <div class="prod-placar-num" id="prod-mes-num">—</div>
-      <div class="prod-placar-sub" id="prod-mes-sub">Carregando...</div>
-    </div>
-  </div>
-
-  <div class="prod-ranking">
-    <div class="ph" style="background:linear-gradient(90deg,#0f3d26,#1a5c3a);color:#fff;border-radius:16px 16px 0 0">
-      <h2 style="color:#fff">🏅 Ranking do mês — Comparecimentos</h2>
-      <span id="prod-rank-mes" style="font-size:11px;color:rgba(255,255,255,.6);margin-left:auto">—</span>
-    </div>
-    <div id="prod-ranking-list"><div class="prod-atualizado"><span class="prod-spinner"></span>Carregando dados...</div></div>
-  </div>
-
-  <div class="prod-ranking">
-    <div class="ph" style="background:linear-gradient(90deg,#1a3f6b,#0f2a47);color:#fff;border-radius:16px 16px 0 0">
-      <h2 style="color:#fff">⚡ Atendimentos de hoje — Compareceram</h2>
-      <span id="prod-hoje-label" style="font-size:11px;color:rgba(255,255,255,.6);margin-left:auto">—</span>
-    </div>
-    <div id="prod-hoje-list"><div class="prod-atualizado"><span class="prod-spinner"></span>Carregando dados...</div></div>
-  </div>
-
-  <div class="prod-atualizado" id="prod-footer">Atualiza automaticamente a cada 5 minutos</div>
-</div>
-
 <!-- METAS E COMISSÕES -->
 <div class="view" id="view-metas">
 
@@ -786,6 +746,39 @@ tr:hover td{background:var(--paper)}
     </div>
   </div>
 
+</div>
+
+<!-- PRODUÇÃO -->
+<div class="view" id="view-producao">
+  <div class="prod-hero">
+    <div class="prod-placar hoje">
+      <span class="prod-placar-badge">🔴 AO VIVO</span>
+      <div class="prod-placar-label">Compareceram hoje</div>
+      <div class="prod-placar-num" id="prod-hoje-num">—</div>
+      <div class="prod-placar-sub" id="prod-hoje-sub">Carregando...</div>
+    </div>
+    <div class="prod-placar mes">
+      <span class="prod-placar-badge">📅 MÊS</span>
+      <div class="prod-placar-label">Compareceram no mês</div>
+      <div class="prod-placar-num" id="prod-mes-num">—</div>
+      <div class="prod-placar-sub" id="prod-mes-sub">Carregando...</div>
+    </div>
+  </div>
+  <div class="prod-ranking">
+    <div class="ph" style="background:linear-gradient(90deg,#0f3d26,#1a5c3a);color:#fff;border-radius:16px 16px 0 0">
+      <h2 style="color:#fff">🏅 Ranking do mês — Comparecimentos</h2>
+      <span id="prod-rank-mes" style="font-size:11px;color:rgba(255,255,255,.6);margin-left:auto">—</span>
+    </div>
+    <div id="prod-ranking-list"><div class="prod-atualizado"><span class="prod-spinner"></span>Carregando...</div></div>
+  </div>
+  <div class="prod-ranking">
+    <div class="ph" style="background:linear-gradient(90deg,#1a3f6b,#0f2a47);color:#fff;border-radius:16px 16px 0 0">
+      <h2 style="color:#fff">⚡ Hoje — Compareceram</h2>
+      <span id="prod-hoje-label" style="font-size:11px;color:rgba(255,255,255,.6);margin-left:auto">—</span>
+    </div>
+    <div id="prod-hoje-list"><div class="prod-atualizado"><span class="prod-spinner"></span>Carregando...</div></div>
+  </div>
+  <div class="prod-atualizado" id="prod-footer">Atualiza automaticamente a cada 5 minutos</div>
 </div>
 
 </div><!-- /main -->
@@ -1879,15 +1872,15 @@ async function buscarRelatorio() {
 
 function filtrarRelatorio() {
   if (!relatorioCache) return;
-  const prof      = document.getElementById('rel-prof').value;
-  const tipo      = document.getElementById('rel-tipo').value;
-  const statusFil = document.getElementById('rel-status-fil') ? document.getElementById('rel-status-fil').value : '';
+  const prof = document.getElementById('rel-prof').value;
+  const tipo = document.getElementById('rel-tipo').value;
 
+  const statusFil = document.getElementById('rel-status-fil') ? document.getElementById('rel-status-fil').value : '';
   relatorioFiltrado = relatorioCache.filter(d => {
     if (d.tipo === 'ignorado_status') return false;
     if (prof && d.profissional !== prof) return false;
     if (tipo && d.tipo !== tipo) return false;
-    if (statusFil && (d.status || 'AGENDADO') !== statusFil) return false;
+    if (statusFil && (d.status||'AGENDADO') !== statusFil) return false;
     return true;
   });
 
@@ -1920,32 +1913,26 @@ function filtrarRelatorio() {
   document.getElementById('rel-table').style.display = 'table';
 
   const STATUS_BADGE = {
-    'COMPARECEU': 'background:#e4f0e9;color:#1a5c3a',
-    'AGENDADO':   'background:#e4ecf5;color:#1a3f6b',
-    'CONFIRMADO': 'background:#fdf3dc;color:#7a4e00',
-    'ATRASADO':   'background:#fbeaea;color:#8c2020'
+    'COMPARECEU':'background:#e4f0e9;color:#1a5c3a',
+    'AGENDADO':'background:#e4ecf5;color:#1a3f6b',
+    'CONFIRMADO':'background:#fdf3dc;color:#7a4e00',
+    'ATRASADO':'background:#fbeaea;color:#8c2020'
   };
-
   const linhas = relatorioFiltrado.map((d, i) => {
-    const confKey = conferidoKey(d);
-    const jaConferido = conferidoGet(confKey);
-    const isComp = d.status === 'COMPARECEU';
-    const rowBg = jaConferido ? 'background:#f0faf4' : '';
-    const btnConf = isComp
-      ? (jaConferido
-          ? `<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>`
-          : `<button onclick="conferirPorIndice(${i}, this)" style="font-family:inherit;font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid #9fd0b5;background:#e4f0e9;color:#1a5c3a;cursor:pointer">✓ Conferir</button>`)
-      : '—';
-    return `<tr style="${rowBg}">
-    <td style="white-space:nowrap">${d.data || '—'}</td>
-    <td style="white-space:nowrap">${d.hora || '—'}</td>
-    <td style="font-weight:500">${d.profissional || '—'}</td>
-    <td>${d.paciente || '—'}</td>
-    <td style="font-size:11px">${d.procedimento || '—'}</td>
-    <td><span style="font-size:11px;font-weight:600;color:${TIPO_COLOR[d.tipo] || 'var(--ink3)'}">${TIPO_LABEL[d.tipo] || d.tipo}</span></td>
-    <td><span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;${STATUS_BADGE[d.status] || 'background:var(--paper2);color:var(--ink3)'}">${d.status || 'AGENDADO'}</span></td>
-    <td>${btnConf}</td>
-  </tr>`;
+    const jC = conferidoGet(conferidoKey(d));
+    const isC = d.status === 'COMPARECEU';
+    const btn = isC ? (jC ? '<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>'
+      : '<button onclick="conferirPorIndice('+i+',this)" style="font-family:inherit;font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid #9fd0b5;background:#e4f0e9;color:#1a5c3a;cursor:pointer">✓ Conferir</button>') : '—';
+    return '<tr style="'+(jC?'background:#f0faf4':'')+'">'
+      +'<td style="white-space:nowrap">'+(d.data||'—')+'</td>'
+      +'<td style="white-space:nowrap">'+(d.hora||'—')+'</td>'
+      +'<td style="font-weight:500">'+(d.profissional||'—')+'</td>'
+      +'<td>'+(d.paciente||'—')+'</td>'
+      +'<td style="font-size:11px">'+(d.procedimento||'—')+'</td>'
+      +'<td><span style="font-size:11px;font-weight:600;color:'+(TIPO_COLOR[d.tipo]||'var(--ink3)')+'">'+( TIPO_LABEL[d.tipo]||d.tipo)+'</span></td>'
+      +'<td><span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;'+(STATUS_BADGE[d.status]||'background:var(--paper2);color:var(--ink3)')+'">'+( d.status||'AGENDADO')+'</span></td>'
+      +'<td>'+btn+'</td>'
+      +'</tr>';
   }).join('');
 
   document.getElementById('rel-tbody').innerHTML = linhas;
@@ -1954,11 +1941,10 @@ function filtrarRelatorio() {
 function exportarRelatorioCSV() {
   if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
   const header = 'Data,Hora,Profissional,Paciente,Procedimento,Tipo,Status,Conferido';
-  const rows = relatorioFiltrado.map(d => {
-    const conf = conferidoGet(conferidoKey(d)) ? 'SIM' : '';
-    return [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo, d.status||'AGENDADO', conf]
-    .map(function(v){ return '"' + String(v).replace(/"/g,'""')+'"'; }).join(',');
-  });
+  const rows = relatorioFiltrado.map(d =>
+    [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo, d.status||'AGENDADO', conferidoGet(conferidoKey(d))?'SIM':'']
+    .map(function(v){ return '"' + String(v).replace(/"/g,'""')+'"'; }).join(',')
+  );
   const csv = '\uFEFF' + header + '\n' + rows.join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
@@ -1968,216 +1954,6 @@ function exportarRelatorioCSV() {
 }
 
 function exportarRelatorioPDF() {
-  if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
-
-  const mes  = document.getElementById('rel-mes');
-  const ano  = document.getElementById('rel-ano').value;
-  const mesNome = mes.options[mes.selectedIndex].text;
-  const prof = document.getElementById('rel-prof').value || 'Todos os profissionais';
-
-  const contagem = {};
-  relatorioFiltrado.forEach(d => { contagem[d.tipo] = (contagem[d.tipo] || 0) + 1; });
-  const resumo = Object.entries(contagem).map(([t,n]) => `${TIPO_LABEL[t]}: ${n}`).join(' | ');
-
-  const linhasHTML = relatorioFiltrado.map((d, i) => {
-    const conf = conferidoGet(conferidoKey(d)) ? '✅' : '';
-    return `<tr style="background:${i%2===0?'#f9f9f9':'#fff'}">
-      <td>${d.data||'—'}</td>
-      <td>${d.hora||'—'}</td>
-      <td><strong>${d.profissional||'—'}</strong></td>
-      <td>${d.paciente||'—'}</td>
-      <td style="font-size:11px">${d.procedimento||'—'}</td>
-      <td style="font-size:11px;font-weight:600">${TIPO_LABEL[d.tipo]||d.tipo}</td>
-      <td style="font-size:11px;font-weight:600">${d.status||'AGENDADO'}</td>
-      <td style="text-align:center">${conf}</td>
-    </tr>`;
-  }).join('');
-
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <title>Relatório de Atendimentos</title>
-  <style>
-    body{font-family:Arial,sans-serif;font-size:12px;color:#222;padding:20px}
-    h1{font-size:16px;color:#0f3d26;margin:0 0 4px}
-    .sub{font-size:11px;color:#666;margin-bottom:14px}
-    .resumo{background:#e4f0e9;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:12px;font-weight:600;color:#0f3d26}
-    table{width:100%;border-collapse:collapse}
-    th{background:#0f3d26;color:#fff;padding:7px 10px;font-size:11px;text-align:left}
-    td{padding:6px 10px;border-bottom:1px solid #eee;font-size:11px}
-    .footer{margin-top:16px;font-size:10px;color:#999;text-align:right}
-  </style></head><body>
-  <h1>Relatório de Atendimentos — Neuroavaliação na Prática</h1>
-  <div class="sub">${mesNome}/${ano} · ${prof} · Total: ${relatorioFiltrado.length} atendimentos</div>
-  <div class="resumo">${resumo}</div>
-  <table>
-    <thead><tr><th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th><th>Status</th><th>Conf.</th></tr></thead>
-    <tbody>${linhasHTML}</tbody>
-  </table>
-  <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')} · Sistema Neuroavaliação Agendamento</div>
-  <script>window.onload=()=>{window.print()}<\/script>
-  </body></html>`;
-
-  const w = window.open('','_blank');
-  w.document.write(html);
-  w.document.close();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// CONFERÊNCIA DE ATENDIMENTOS — localStorage
-// ═══════════════════════════════════════════════════════════════════
-
-function conferidoKey(d) {
-  return 'conf||' + (d.profissional||'').trim().toUpperCase()
-    + '||' + (d.paciente||'').trim().toUpperCase()
-    + '||' + (d.data||'')
-    + '||' + (d.tipo||'');
-}
-
-function conferidoGet(key) {
-  try { return !!localStorage.getItem(key); } catch(e) { return false; }
-}
-
-function conferidoSet(key) {
-  try {
-    const agora = new Date().toLocaleString('pt-BR');
-    localStorage.setItem(key, 'Eliana|' + agora);
-  } catch(e) {}
-}
-
-function conferirAtendimento(key, btn) {
-  conferidoSet(key);
-  const td = btn.parentElement;
-  td.innerHTML = '<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>';
-  const tr = td.parentElement;
-  tr.style.background = '#f0faf4';
-  toast('Conferido! ✓', 'success');
-}
-
-function conferirPorIndice(idx, btn) {
-  const d = relatorioFiltrado[idx];
-  if (!d) return;
-  const key = conferidoKey(d);
-  conferidoSet(key);
-  const td = btn.parentElement;
-  td.innerHTML = '<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>';
-  const tr = td.parentElement;
-  tr.style.background = '#f0faf4';
-  toast('Conferido! ✓', 'success');
-}
-
-function contarConferidos(lista) {
-  return lista.filter(d => d.status === 'COMPARECEU' && conferidoGet(conferidoKey(d))).length;
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// PAINEL DE PRODUÇÃO — Ao vivo para todos
-// ═══════════════════════════════════════════════════════════════════
-
-const CORES_PROF = ['#1a5c3a','#1a3f6b','#8c2020','#7a4e00','#4a2472','#0f5454','#2d6b2d','#5c1a3a','#1a5c5c','#6b4e1a'];
-let prodTimer = null;
-
-function iniciarProducao() {
-  carregarProducao();
-  if (prodTimer) clearInterval(prodTimer);
-  prodTimer = setInterval(carregarProducao, 5 * 60 * 1000);
-}
-
-async function carregarProducao() {
-  const agora = new Date();
-  const mes   = agora.getMonth() + 1;
-  const ano   = agora.getFullYear();
-  const hoje  = String(agora.getDate()).padStart(2,'0') + '/' + String(mes).padStart(2,'0') + '/' + ano;
-  const mesNome = agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
-
-  try {
-    const url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mes + '&detalhes=1&t=' + Date.now();
-    const resp = await fetch(url);
-    const data = await resp.json();
-
-    if (!data || data.erro) return;
-
-    const detalhes = data.detalhes || [];
-
-    // Filtra só COMPARECEU
-    const comparecidos = detalhes.filter(d => d.status === 'COMPARECEU');
-
-    // Hoje
-    const hojeComparecidos = comparecidos.filter(d => d.data === hoje);
-    const hojeConferidos   = hojeComparecidos.filter(d => conferidoGet(conferidoKey(d)));
-    const mesConferidos    = contarConferidos(comparecidos);
-
-    // Placar hoje
-    document.getElementById('prod-hoje-num').textContent = hojeComparecidos.length;
-    document.getElementById('prod-hoje-sub').textContent = hoje + ' · ' + hojeConferidos.length + ' conferido(s) pela Eliana';
-
-    // Placar mês
-    document.getElementById('prod-mes-num').textContent = comparecidos.length;
-    document.getElementById('prod-mes-sub').textContent = mesNome + ' · ' + mesConferidos + ' conferido(s) · ' + (comparecidos.length - mesConferidos) + ' pendente(s)';
-    document.getElementById('prod-rank-mes').textContent = mesNome;
-
-    // Ranking do mês por profissional
-    const rankMes = {};
-    comparecidos.forEach(d => {
-      if (!d.profissional) return;
-      rankMes[d.profissional] = (rankMes[d.profissional] || 0) + 1;
-    });
-    const rankMesArr = Object.entries(rankMes).sort((a,b) => b[1]-a[1]);
-    const maxMes = rankMesArr[0] ? rankMesArr[0][1] : 1;
-
-    const MEDALHAS = ['🥇','🥈','🥉'];
-    const rankHtml = rankMesArr.length === 0
-      ? '<div class="prod-atualizado">Nenhum comparecimento registrado ainda.</div>'
-      : rankMesArr.map(([nome, qtd], i) => {
-          const iniciais = nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
-          const cor = CORES_PROF[i % CORES_PROF.length];
-          const posClass = i===0?'gold':i===1?'silver':i===2?'bronze':'';
-          const pct = Math.round((qtd/maxMes)*100);
-          return `<div class="prod-rank-item">
-            <span class="prod-rank-pos ${posClass}">${i < 3 ? MEDALHAS[i] : (i+1)+'°'}</span>
-            <div class="prod-rank-av" style="background:${cor}">${iniciais}</div>
-            <div class="prod-rank-info">
-              <div class="prod-rank-name">${nome}</div>
-              <div class="prod-rank-bar"><div class="prod-rank-fill" style="width:${pct}%"></div></div>
-            </div>
-            <div class="prod-rank-count">${qtd}</div>
-          </div>`;
-        }).join('');
-    document.getElementById('prod-ranking-list').innerHTML = rankHtml;
-
-    // Lista de hoje
-    document.getElementById('prod-hoje-label').textContent = hoje;
-    const hojeSorted = [...hojeComparecidos].sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
-    const hojeHtml = hojeSorted.length === 0
-      ? '<div class="prod-atualizado">Nenhum comparecimento registrado hoje ainda.</div>'
-      : hojeSorted.map(d => {
-          const profIniciais = (d.profissional||'?').split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
-          const idx = rankMesArr.findIndex(([n])=>n===d.profissional);
-          const cor = CORES_PROF[(idx>=0?idx:0) % CORES_PROF.length];
-          const conf = conferidoGet(conferidoKey(d));
-          const badge = conf
-            ? `<span class="prod-status-badge" style="background:#e4f0e9;color:#1a5c3a">✅ Conferido</span>`
-            : `<span class="prod-status-badge" style="background:#fdf3dc;color:#7a4e00">⏳ Pendente</span>`;
-          return `<div class="prod-rank-item">
-            <span style="font-size:11px;color:var(--ink3);min-width:42px">${d.hora||'—'}</span>
-            <div class="prod-rank-av" style="background:${cor};width:28px;height:28px;font-size:9px">${profIniciais}</div>
-            <div class="prod-rank-info">
-              <div class="prod-rank-name" style="font-size:12px">${d.profissional||'—'}</div>
-              <div class="prod-rank-tipo">${d.paciente||'—'}</div>
-            </div>
-            ${badge}
-          </div>`;
-        }).join('');
-    document.getElementById('prod-hoje-list').innerHTML = hojeHtml;
-
-    // Footer
-    document.getElementById('prod-footer').textContent = '⏱ Atualizado em ' + agora.toLocaleTimeString('pt-BR') + ' · Atualiza a cada 5 minutos';
-
-  } catch(err) {
-    document.getElementById('prod-hoje-num').textContent = '—';
-    document.getElementById('prod-mes-num').textContent = '—';
-  }
-}
-
-
   if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
 
   const mes  = document.getElementById('rel-mes');
@@ -2198,7 +1974,6 @@ async function carregarProducao() {
       <td>${d.paciente||'—'}</td>
       <td style="font-size:11px">${d.procedimento||'—'}</td>
       <td style="font-size:11px;font-weight:600">${TIPO_LABEL[d.tipo]||d.tipo}</td>
-      <td style="font-size:11px;font-weight:600">${d.status||'AGENDADO'}</td>
     </tr>`).join('');
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -2217,7 +1992,7 @@ async function carregarProducao() {
   <div class="sub">${mesNome}/${ano} · ${prof} · Total: ${relatorioFiltrado.length} atendimentos</div>
   <div class="resumo">${resumo}</div>
   <table>
-    <thead><tr><th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th><th>Status</th></tr></thead>
+    <thead><tr><th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th></tr></thead>
     <tbody>${linhasHTML}</tbody>
   </table>
   <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')} · Sistema Neuroavaliação Agendamento</div>
@@ -2227,6 +2002,112 @@ async function carregarProducao() {
   const w = window.open('','_blank');
   w.document.write(html);
   w.document.close();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RELATÓRIO PRODOCTOR — funções adicionais
+// ═══════════════════════════════════════════════════════════════════
+
+// Conferência de atendimentos
+function conferidoKey(d) {
+  return 'conf_' + btoa(encodeURIComponent(
+    (d.profissional||'') + '|' + (d.paciente||'') + '|' + (d.data||'') + '|' + (d.tipo||'')
+  )).replace(/=/g,'');
+}
+function conferidoGet(key) { try { return !!localStorage.getItem(key); } catch(e) { return false; } }
+function conferidoSet(key) { try { localStorage.setItem(key, new Date().toLocaleString('pt-BR')); } catch(e) {} }
+function conferirPorIndice(idx, btn) {
+  var d = relatorioFiltrado[idx];
+  if (!d) return;
+  conferidoSet(conferidoKey(d));
+  btn.parentElement.innerHTML = '<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>';
+  btn.parentElement.parentElement.style.background = '#f0faf4';
+  toast('Conferido!', 'success');
+}
+function contarConferidos(lista) {
+  return lista.filter(function(d){ return d.status === 'COMPARECEU' && conferidoGet(conferidoKey(d)); }).length;
+}
+
+// Painel de Produção
+var prodTimer = null;
+var CORES_PROD = ['#1a5c3a','#1a3f6b','#8c2020','#7a4e00','#4a2472','#0f5454','#2d6b2d','#5c1a3a','#1a5c5c','#6b4e1a'];
+
+function iniciarProducao() {
+  carregarProducao();
+  if (prodTimer) clearInterval(prodTimer);
+  prodTimer = setInterval(carregarProducao, 5 * 60 * 1000);
+}
+
+async function carregarProducao() {
+  var agora = new Date();
+  var mes = agora.getMonth() + 1;
+  var ano = agora.getFullYear();
+  var d = agora.getDate();
+  var hoje = String(d).padStart(2,'0') + '/' + String(mes).padStart(2,'0') + '/' + ano;
+  var mesNome = agora.toLocaleString('pt-BR', {month:'long', year:'numeric'});
+  try {
+    var url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mes + '&detalhes=1&t=' + Date.now();
+    var resp = await fetch(url);
+    var data = await resp.json();
+    if (!data || data.erro) return;
+    var detalhes = data.detalhes || [];
+    var comparecidos = detalhes.filter(function(x){ return x.status === 'COMPARECEU'; });
+    var hojeComp = comparecidos.filter(function(x){ return x.data === hoje; });
+    var hojeConf = hojeComp.filter(function(x){ return conferidoGet(conferidoKey(x)); });
+    var mesConf = contarConferidos(comparecidos);
+
+    document.getElementById('prod-hoje-num').textContent = hojeComp.length;
+    document.getElementById('prod-hoje-sub').textContent = hoje + ' · ' + hojeConf.length + ' conferido(s)';
+    document.getElementById('prod-mes-num').textContent = comparecidos.length;
+    document.getElementById('prod-mes-sub').textContent = mesNome + ' · ' + mesConf + ' conferido(s) · ' + (comparecidos.length - mesConf) + ' pendente(s)';
+    document.getElementById('prod-rank-mes').textContent = mesNome;
+
+    // Ranking mês
+    var rank = {};
+    comparecidos.forEach(function(x){ if(x.profissional) rank[x.profissional] = (rank[x.profissional]||0)+1; });
+    var rankArr = Object.entries(rank).sort(function(a,b){return b[1]-a[1];});
+    var maxQ = rankArr[0] ? rankArr[0][1] : 1;
+    var medals = ['🥇','🥈','🥉'];
+    document.getElementById('prod-ranking-list').innerHTML = rankArr.length === 0
+      ? '<div class="prod-atualizado">Nenhum comparecimento ainda.</div>'
+      : rankArr.map(function(r, i){
+          var iniciais = r[0].split(' ').slice(0,2).map(function(p){return p[0];}).join('');
+          var cor = CORES_PROD[i % CORES_PROD.length];
+          var pct = Math.round((r[1]/maxQ)*100);
+          var pos = i < 3 ? medals[i] : (i+1)+'°';
+          var pc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+          return '<div class="prod-rank-item"><span class="prod-rank-pos '+pc+'">'+pos+'</span>'
+            +'<div class="prod-rank-av" style="background:'+cor+'">'+iniciais+'</div>'
+            +'<div class="prod-rank-info"><div class="prod-rank-name">'+r[0]+'</div>'
+            +'<div class="prod-rank-bar"><div class="prod-rank-fill" style="width:'+pct+'%"></div></div></div>'
+            +'<div class="prod-rank-count">'+r[1]+'</div></div>';
+        }).join('');
+
+    // Lista hoje
+    document.getElementById('prod-hoje-label').textContent = hoje;
+    var sorted = hojeComp.slice().sort(function(a,b){return (a.hora||'').localeCompare(b.hora||'');});
+    document.getElementById('prod-hoje-list').innerHTML = sorted.length === 0
+      ? '<div class="prod-atualizado">Nenhum comparecimento hoje ainda.</div>'
+      : sorted.map(function(x){
+          var idx2 = rankArr.findIndex(function(r){return r[0]===x.profissional;});
+          var cor = CORES_PROD[(idx2>=0?idx2:0) % CORES_PROD.length];
+          var ini = (x.profissional||'?').split(' ').slice(0,2).map(function(p){return p[0];}).join('');
+          var conf = conferidoGet(conferidoKey(x));
+          var badge = conf
+            ? '<span class="prod-status-badge" style="background:#e4f0e9;color:#1a5c3a">✅ Conferido</span>'
+            : '<span class="prod-status-badge" style="background:#fdf3dc;color:#7a4e00">⏳ Pendente</span>';
+          return '<div class="prod-rank-item">'
+            +'<span style="font-size:11px;color:var(--ink3);min-width:42px">'+(x.hora||'—')+'</span>'
+            +'<div class="prod-rank-av" style="background:'+cor+';width:28px;height:28px;font-size:9px">'+ini+'</div>'
+            +'<div class="prod-rank-info"><div class="prod-rank-name" style="font-size:12px">'+(x.profissional||'—')+'</div>'
+            +'<div class="prod-rank-tipo">'+(x.paciente||'—')+'</div></div>'+badge+'</div>';
+        }).join('');
+
+    document.getElementById('prod-footer').textContent = '⏱ Atualizado ' + agora.toLocaleTimeString('pt-BR') + ' · Atualiza a cada 5 min';
+  } catch(e) {
+    document.getElementById('prod-hoje-num').textContent = '—';
+    document.getElementById('prod-mes-num').textContent = '—';
+  }
 }
 
 </script>

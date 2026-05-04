@@ -586,6 +586,16 @@ tr:hover td{background:var(--paper)}
           <option value="outro">Outros</option>
         </select>
       </div>
+      <div class="fg" style="margin:0">
+        <label style="font-size:11px">Status</label>
+        <select id="rel-status-fil" style="font-family:inherit;font-size:13px;padding:7px 11px;border:1px solid var(--paper3);border-radius:8px;background:var(--white);color:var(--ink)">
+          <option value="">Todos</option>
+          <option value="COMPARECEU">✅ Compareceu</option>
+          <option value="AGENDADO">📅 Agendado</option>
+          <option value="CONFIRMADO">🔔 Confirmado</option>
+          <option value="ATRASADO">⚠️ Atrasado</option>
+        </select>
+      </div>
       <button onclick="buscarRelatorio()" style="font-family:inherit;font-size:13px;font-weight:600;padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:8px;cursor:pointer">🔍 Buscar</button>
       <button onclick="exportarRelatorioCSV()" id="rel-btn-csv" style="display:none;font-family:inherit;font-size:13px;padding:8px 14px;background:var(--paper);border:1px solid var(--paper3);border-radius:8px;cursor:pointer;color:var(--ink3)">⬇ CSV</button>
       <button onclick="exportarRelatorioPDF()" id="rel-btn-pdf" style="display:none;font-family:inherit;font-size:13px;padding:8px 14px;background:var(--paper);border:1px solid var(--paper3);border-radius:8px;cursor:pointer;color:var(--ink3)">📄 PDF</button>
@@ -595,7 +605,7 @@ tr:hover td{background:var(--paper)}
     <!-- Tabela -->
     <div style="overflow-x:auto;max-height:420px;overflow-y:auto">
       <table id="rel-table" style="display:none"><thead><tr>
-        <th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th>
+        <th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th><th>Status</th>
       </tr></thead><tbody id="rel-tbody"></tbody></table>
       <div id="rel-empty" style="padding:32px;text-align:center;color:var(--ink3);font-size:13px">Clique em Buscar para carregar os atendimentos do ProDoctor.</div>
     </div>
@@ -1801,13 +1811,15 @@ async function buscarRelatorio() {
 
 function filtrarRelatorio() {
   if (!relatorioCache) return;
-  const prof = document.getElementById('rel-prof').value;
-  const tipo = document.getElementById('rel-tipo').value;
+  const prof      = document.getElementById('rel-prof').value;
+  const tipo      = document.getElementById('rel-tipo').value;
+  const statusFil = document.getElementById('rel-status-fil') ? document.getElementById('rel-status-fil').value : '';
 
   relatorioFiltrado = relatorioCache.filter(d => {
     if (d.tipo === 'ignorado_status') return false;
     if (prof && d.profissional !== prof) return false;
     if (tipo && d.tipo !== tipo) return false;
+    if (statusFil && (d.status || 'AGENDADO') !== statusFil) return false;
     return true;
   });
 
@@ -1839,6 +1851,13 @@ function filtrarRelatorio() {
   document.getElementById('rel-empty').style.display = 'none';
   document.getElementById('rel-table').style.display = 'table';
 
+  const STATUS_BADGE = {
+    'COMPARECEU': 'background:#e4f0e9;color:#1a5c3a',
+    'AGENDADO':   'background:#e4ecf5;color:#1a3f6b',
+    'CONFIRMADO': 'background:#fdf3dc;color:#7a4e00',
+    'ATRASADO':   'background:#fbeaea;color:#8c2020'
+  };
+
   const linhas = relatorioFiltrado.map(d => `<tr>
     <td style="white-space:nowrap">${d.data || '—'}</td>
     <td style="white-space:nowrap">${d.hora || '—'}</td>
@@ -1846,6 +1865,7 @@ function filtrarRelatorio() {
     <td>${d.paciente || '—'}</td>
     <td style="font-size:11px">${d.procedimento || '—'}</td>
     <td><span style="font-size:11px;font-weight:600;color:${TIPO_COLOR[d.tipo] || 'var(--ink3)'}">${TIPO_LABEL[d.tipo] || d.tipo}</span></td>
+    <td><span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;${STATUS_BADGE[d.status] || 'background:var(--paper2);color:var(--ink3)'}">${d.status || 'AGENDADO'}</span></td>
   </tr>`).join('');
 
   document.getElementById('rel-tbody').innerHTML = linhas;
@@ -1853,9 +1873,9 @@ function filtrarRelatorio() {
 
 function exportarRelatorioCSV() {
   if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
-  const header = 'Data,Hora,Profissional,Paciente,Procedimento,Tipo';
+  const header = 'Data,Hora,Profissional,Paciente,Procedimento,Tipo,Status';
   const rows = relatorioFiltrado.map(d =>
-    [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo]
+    [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo, d.status||'AGENDADO']
     .map(function(v){ return '"' + String(v).replace(/"/g,'""')+'"'; }).join(',')
   );
   const csv = '\uFEFF' + header + '\n' + rows.join('\n');
@@ -1887,6 +1907,7 @@ function exportarRelatorioPDF() {
       <td>${d.paciente||'—'}</td>
       <td style="font-size:11px">${d.procedimento||'—'}</td>
       <td style="font-size:11px;font-weight:600">${TIPO_LABEL[d.tipo]||d.tipo}</td>
+      <td style="font-size:11px;font-weight:600">${d.status||'AGENDADO'}</td>
     </tr>`).join('');
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -1905,7 +1926,7 @@ function exportarRelatorioPDF() {
   <div class="sub">${mesNome}/${ano} · ${prof} · Total: ${relatorioFiltrado.length} atendimentos</div>
   <div class="resumo">${resumo}</div>
   <table>
-    <thead><tr><th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th></tr></thead>
+    <thead><tr><th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th><th>Status</th></tr></thead>
     <tbody>${linhasHTML}</tbody>
   </table>
   <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')} · Sistema Neuroavaliação Agendamento</div>

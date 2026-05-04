@@ -235,6 +235,36 @@ tr:hover td{background:var(--paper)}
 .toast.success{background:var(--green)}.toast.error{background:var(--red)}
 
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--paper3);border-radius:4px}
+
+/* ── PRODUÇÃO ── */
+.prod-hero{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.prod-placar{border-radius:16px;padding:22px 24px;color:#fff;position:relative;overflow:hidden}
+.prod-placar.hoje{background:linear-gradient(135deg,#1a3f6b 0%,#0f2a47 100%)}
+.prod-placar.mes{background:linear-gradient(135deg,#1a5c3a 0%,#0f3d26 100%)}
+.prod-placar::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)}
+.prod-placar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.6);margin-bottom:6px}
+.prod-placar-num{font-size:52px;font-weight:700;line-height:1;letter-spacing:-2px}
+.prod-placar-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:6px}
+.prod-placar-badge{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:#fff}
+.prod-ranking{background:var(--white);border:1px solid var(--paper3);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.prod-rank-item{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--paper3);transition:.15s}
+.prod-rank-item:last-child{border-bottom:none}
+.prod-rank-item:hover{background:var(--paper)}
+.prod-rank-pos{font-size:16px;font-weight:700;width:28px;text-align:center;color:var(--ink3)}
+.prod-rank-pos.gold{color:#f59e0b}
+.prod-rank-pos.silver{color:#6b7280}
+.prod-rank-pos.bronze{color:#92400e}
+.prod-rank-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.prod-rank-info{flex:1}
+.prod-rank-name{font-size:13px;font-weight:600}
+.prod-rank-tipo{font-size:11px;color:var(--ink3);margin-top:1px}
+.prod-rank-count{font-size:22px;font-weight:700;color:var(--green)}
+.prod-rank-bar{height:4px;background:var(--paper2);border-radius:2px;margin-top:5px;overflow:hidden}
+.prod-rank-fill{height:100%;border-radius:2px;background:var(--green);transition:.6s}
+.prod-status-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px}
+.prod-atualizado{font-size:11px;color:var(--ink3);text-align:center;padding:10px}
+.prod-spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--paper3);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -354,6 +384,7 @@ tr:hover td{background:var(--paper)}
     <button onclick="showView('registros')">Registros</button>
     <button onclick="showView('atendentes')">Atendentes</button>
     <button onclick="showView('metas')">🏆 Metas</button>
+    <button onclick="showView('producao')">📊 Produção</button>
     <button onclick="showView('nova')">+ Nova</button>
     <button class="admin-only" onclick="showView('admin')">⚙ Admin</button>
   </nav>
@@ -605,7 +636,7 @@ tr:hover td{background:var(--paper)}
     <!-- Tabela -->
     <div style="overflow-x:auto;max-height:420px;overflow-y:auto">
       <table id="rel-table" style="display:none"><thead><tr>
-        <th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th><th>Status</th>
+        <th>Data</th><th>Hora</th><th>Profissional</th><th>Paciente</th><th>Procedimento</th><th>Tipo</th><th>Status</th><th>Conferido</th>
       </tr></thead><tbody id="rel-tbody"></tbody></table>
       <div id="rel-empty" style="padding:32px;text-align:center;color:var(--ink3);font-size:13px">Clique em Buscar para carregar os atendimentos do ProDoctor.</div>
     </div>
@@ -618,6 +649,42 @@ tr:hover td{background:var(--paper)}
   </div>
 </div>
 
+
+<!-- PRODUÇÃO — Painel ao vivo para todos -->
+<div class="view" id="view-producao">
+  <div class="prod-hero">
+    <div class="prod-placar hoje">
+      <span class="prod-placar-badge">🔴 AO VIVO</span>
+      <div class="prod-placar-label">Compareceram hoje</div>
+      <div class="prod-placar-num" id="prod-hoje-num">—</div>
+      <div class="prod-placar-sub" id="prod-hoje-sub">Carregando...</div>
+    </div>
+    <div class="prod-placar mes">
+      <span class="prod-placar-badge">📅 MÊS</span>
+      <div class="prod-placar-label">Compareceram no mês</div>
+      <div class="prod-placar-num" id="prod-mes-num">—</div>
+      <div class="prod-placar-sub" id="prod-mes-sub">Carregando...</div>
+    </div>
+  </div>
+
+  <div class="prod-ranking">
+    <div class="ph" style="background:linear-gradient(90deg,#0f3d26,#1a5c3a);color:#fff;border-radius:16px 16px 0 0">
+      <h2 style="color:#fff">🏅 Ranking do mês — Comparecimentos</h2>
+      <span id="prod-rank-mes" style="font-size:11px;color:rgba(255,255,255,.6);margin-left:auto">—</span>
+    </div>
+    <div id="prod-ranking-list"><div class="prod-atualizado"><span class="prod-spinner"></span>Carregando dados...</div></div>
+  </div>
+
+  <div class="prod-ranking">
+    <div class="ph" style="background:linear-gradient(90deg,#1a3f6b,#0f2a47);color:#fff;border-radius:16px 16px 0 0">
+      <h2 style="color:#fff">⚡ Atendimentos de hoje — Compareceram</h2>
+      <span id="prod-hoje-label" style="font-size:11px;color:rgba(255,255,255,.6);margin-left:auto">—</span>
+    </div>
+    <div id="prod-hoje-list"><div class="prod-atualizado"><span class="prod-spinner"></span>Carregando dados...</div></div>
+  </div>
+
+  <div class="prod-atualizado" id="prod-footer">Atualiza automaticamente a cada 5 minutos</div>
+</div>
 
 <!-- METAS E COMISSÕES -->
 <div class="view" id="view-metas">
@@ -1469,11 +1536,12 @@ function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.querySelectorAll('.h-nav button').forEach(b=>b.classList.remove('active'));
-  const map={dashboard:0,acompanhamento:1,registros:2,atendentes:3,nova:4,admin:5,metas:6};
+  const map={dashboard:0,acompanhamento:1,registros:2,atendentes:3,metas:4,producao:5,nova:6,admin:7};
   const btns=document.querySelectorAll('.h-nav button');if(btns[map[v]])btns[map[v]].classList.add('active');
   if(v==='atendentes')renderAtendentes(monthData(curYear,curMonth));
   if(v==='admin')renderAdmin();
   if(v==='metas')renderMetas();
+  if(v==='producao')iniciarProducao();
 }
 function toast(msg,type='success'){
   const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.classList.add('show');
@@ -1858,7 +1926,17 @@ function filtrarRelatorio() {
     'ATRASADO':   'background:#fbeaea;color:#8c2020'
   };
 
-  const linhas = relatorioFiltrado.map(d => `<tr>
+  const linhas = relatorioFiltrado.map((d, i) => {
+    const confKey = conferidoKey(d);
+    const jaConferido = conferidoGet(confKey);
+    const isComp = d.status === 'COMPARECEU';
+    const rowBg = jaConferido ? 'background:#f0faf4' : '';
+    const btnConf = isComp
+      ? (jaConferido
+          ? `<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>`
+          : `<button onclick="conferirAtendimento('${confKey}', this)" style="font-family:inherit;font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid #9fd0b5;background:#e4f0e9;color:#1a5c3a;cursor:pointer">✓ Conferir</button>`)
+      : '—';
+    return `<tr style="${rowBg}">
     <td style="white-space:nowrap">${d.data || '—'}</td>
     <td style="white-space:nowrap">${d.hora || '—'}</td>
     <td style="font-weight:500">${d.profissional || '—'}</td>
@@ -1866,18 +1944,21 @@ function filtrarRelatorio() {
     <td style="font-size:11px">${d.procedimento || '—'}</td>
     <td><span style="font-size:11px;font-weight:600;color:${TIPO_COLOR[d.tipo] || 'var(--ink3)'}">${TIPO_LABEL[d.tipo] || d.tipo}</span></td>
     <td><span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;${STATUS_BADGE[d.status] || 'background:var(--paper2);color:var(--ink3)'}">${d.status || 'AGENDADO'}</span></td>
-  </tr>`).join('');
+    <td>${btnConf}</td>
+  </tr>`;
+  }).join('');
 
   document.getElementById('rel-tbody').innerHTML = linhas;
 }
 
 function exportarRelatorioCSV() {
   if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
-  const header = 'Data,Hora,Profissional,Paciente,Procedimento,Tipo,Status';
-  const rows = relatorioFiltrado.map(d =>
-    [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo, d.status||'AGENDADO']
-    .map(function(v){ return '"' + String(v).replace(/"/g,'""')+'"'; }).join(',')
-  );
+  const header = 'Data,Hora,Profissional,Paciente,Procedimento,Tipo,Status,Conferido';
+  const rows = relatorioFiltrado.map(d => {
+    const conf = conferidoGet(conferidoKey(d)) ? 'SIM' : '';
+    return [d.data||'', d.hora||'', d.profissional||'', d.paciente||'', d.procedimento||'', TIPO_LABEL[d.tipo]||d.tipo, d.status||'AGENDADO', conf]
+    .map(function(v){ return '"' + String(v).replace(/"/g,'""')+'"'; }).join(',');
+  });
   const csv = '\uFEFF' + header + '\n' + rows.join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
@@ -1886,7 +1967,151 @@ function exportarRelatorioCSV() {
   toast('CSV exportado!', 'success');
 }
 
-function exportarRelatorioPDF() {
+// ═══════════════════════════════════════════════════════════════════
+// CONFERÊNCIA DE ATENDIMENTOS — localStorage
+// ═══════════════════════════════════════════════════════════════════
+
+function conferidoKey(d) {
+  return 'conf||' + (d.profissional||'').trim().toUpperCase()
+    + '||' + (d.paciente||'').trim().toUpperCase()
+    + '||' + (d.data||'')
+    + '||' + (d.tipo||'');
+}
+
+function conferidoGet(key) {
+  try { return !!localStorage.getItem(key); } catch(e) { return false; }
+}
+
+function conferidoSet(key) {
+  try {
+    const agora = new Date().toLocaleString('pt-BR');
+    localStorage.setItem(key, 'Eliana|' + agora);
+  } catch(e) {}
+}
+
+function conferirAtendimento(key, btn) {
+  conferidoSet(key);
+  const td = btn.parentElement;
+  td.innerHTML = '<span style="font-size:10px;font-weight:600;color:#1a5c3a">✅ Conferido</span>';
+  const tr = td.parentElement;
+  tr.style.background = '#f0faf4';
+  toast('Conferido! ✓', 'success');
+}
+
+function contarConferidos(lista) {
+  return lista.filter(d => d.status === 'COMPARECEU' && conferidoGet(conferidoKey(d))).length;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PAINEL DE PRODUÇÃO — Ao vivo para todos
+// ═══════════════════════════════════════════════════════════════════
+
+const CORES_PROF = ['#1a5c3a','#1a3f6b','#8c2020','#7a4e00','#4a2472','#0f5454','#2d6b2d','#5c1a3a','#1a5c5c','#6b4e1a'];
+let prodTimer = null;
+
+function iniciarProducao() {
+  carregarProducao();
+  if (prodTimer) clearInterval(prodTimer);
+  prodTimer = setInterval(carregarProducao, 5 * 60 * 1000);
+}
+
+async function carregarProducao() {
+  const agora = new Date();
+  const mes   = agora.getMonth() + 1;
+  const ano   = agora.getFullYear();
+  const hoje  = String(agora.getDate()).padStart(2,'0') + '/' + String(mes).padStart(2,'0') + '/' + ano;
+  const mesNome = agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+
+  try {
+    const url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mes + '&detalhes=1&t=' + Date.now();
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (!data || data.erro) return;
+
+    const detalhes = data.detalhes || [];
+
+    // Filtra só COMPARECEU
+    const comparecidos = detalhes.filter(d => d.status === 'COMPARECEU');
+
+    // Hoje
+    const hojeComparecidos = comparecidos.filter(d => d.data === hoje);
+    const hojeConferidos   = hojeComparecidos.filter(d => conferidoGet(conferidoKey(d)));
+    const mesConferidos    = contarConferidos(comparecidos);
+
+    // Placar hoje
+    document.getElementById('prod-hoje-num').textContent = hojeComparecidos.length;
+    document.getElementById('prod-hoje-sub').textContent = hoje + ' · ' + hojeConferidos.length + ' conferido(s) pela Eliana';
+
+    // Placar mês
+    document.getElementById('prod-mes-num').textContent = comparecidos.length;
+    document.getElementById('prod-mes-sub').textContent = mesNome + ' · ' + mesConferidos + ' conferido(s) · ' + (comparecidos.length - mesConferidos) + ' pendente(s)';
+    document.getElementById('prod-rank-mes').textContent = mesNome;
+
+    // Ranking do mês por profissional
+    const rankMes = {};
+    comparecidos.forEach(d => {
+      if (!d.profissional) return;
+      rankMes[d.profissional] = (rankMes[d.profissional] || 0) + 1;
+    });
+    const rankMesArr = Object.entries(rankMes).sort((a,b) => b[1]-a[1]);
+    const maxMes = rankMesArr[0] ? rankMesArr[0][1] : 1;
+
+    const MEDALHAS = ['🥇','🥈','🥉'];
+    const rankHtml = rankMesArr.length === 0
+      ? '<div class="prod-atualizado">Nenhum comparecimento registrado ainda.</div>'
+      : rankMesArr.map(([nome, qtd], i) => {
+          const iniciais = nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
+          const cor = CORES_PROF[i % CORES_PROF.length];
+          const posClass = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+          const pct = Math.round((qtd/maxMes)*100);
+          return `<div class="prod-rank-item">
+            <span class="prod-rank-pos ${posClass}">${i < 3 ? MEDALHAS[i] : (i+1)+'°'}</span>
+            <div class="prod-rank-av" style="background:${cor}">${iniciais}</div>
+            <div class="prod-rank-info">
+              <div class="prod-rank-name">${nome}</div>
+              <div class="prod-rank-bar"><div class="prod-rank-fill" style="width:${pct}%"></div></div>
+            </div>
+            <div class="prod-rank-count">${qtd}</div>
+          </div>`;
+        }).join('');
+    document.getElementById('prod-ranking-list').innerHTML = rankHtml;
+
+    // Lista de hoje
+    document.getElementById('prod-hoje-label').textContent = hoje;
+    const hojeSorted = [...hojeComparecidos].sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+    const hojeHtml = hojeSorted.length === 0
+      ? '<div class="prod-atualizado">Nenhum comparecimento registrado hoje ainda.</div>'
+      : hojeSorted.map(d => {
+          const profIniciais = (d.profissional||'?').split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
+          const idx = rankMesArr.findIndex(([n])=>n===d.profissional);
+          const cor = CORES_PROF[(idx>=0?idx:0) % CORES_PROF.length];
+          const conf = conferidoGet(conferidoKey(d));
+          const badge = conf
+            ? `<span class="prod-status-badge" style="background:#e4f0e9;color:#1a5c3a">✅ Conferido</span>`
+            : `<span class="prod-status-badge" style="background:#fdf3dc;color:#7a4e00">⏳ Pendente</span>`;
+          return `<div class="prod-rank-item">
+            <span style="font-size:11px;color:var(--ink3);min-width:42px">${d.hora||'—'}</span>
+            <div class="prod-rank-av" style="background:${cor};width:28px;height:28px;font-size:9px">${profIniciais}</div>
+            <div class="prod-rank-info">
+              <div class="prod-rank-name" style="font-size:12px">${d.profissional||'—'}</div>
+              <div class="prod-rank-tipo">${d.paciente||'—'}</div>
+            </div>
+            ${badge}
+          </div>`;
+        }).join('');
+    document.getElementById('prod-hoje-list').innerHTML = hojeHtml;
+
+    // Footer
+    document.getElementById('prod-footer').textContent = '⏱ Atualizado em ' + agora.toLocaleTimeString('pt-BR') + ' · Atualiza a cada 5 minutos';
+
+  } catch(err) {
+    document.getElementById('prod-hoje-num').textContent = '—';
+    document.getElementById('prod-mes-num').textContent = '—';
+  }
+}
+
+
   if (!relatorioFiltrado.length) { toast('Nenhum dado para exportar.', 'error'); return; }
 
   const mes  = document.getElementById('rel-mes');

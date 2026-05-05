@@ -406,7 +406,7 @@ tr:hover td{background:var(--paper)}
     <div class="user-av" id="h-av" style="background:#1a5c3a">AD</div>
     <div><div class="user-name-h" id="h-name">Administrador</div><div class="user-role-h" id="h-role">Admin</div></div>
     <button class="h-logout" onclick="syncFromSheets(true)" title="Atualizar dados" style="margin-right:4px">🔄</button><button class="h-logout" onclick="doLogout()">Sair</button>
-    <span id="build-badge" style="font-size:9px;color:rgba(255,255,255,.25);margin-left:8px">v20260504-3</span>
+    <span id="build-badge" style="font-size:9px;color:rgba(255,255,255,.25);margin-left:8px">v20260504-4</span>
   </div>
 </header>
 
@@ -1835,7 +1835,7 @@ function toast(msg,type='success'){
 // INTEGRAÇÃO PRODOCOR
 // ═══════════════════════════════════════════════════════════
 const PRODOCOR_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFjC5joHY6rVZ3mG1OvREuiO3zlh75q8LhhhQ5s2boDOb6CNC1IqFgsGq9L4ttQApU/exec';
-const BUILD_VERSION = 'v20260504-3';
+const BUILD_VERSION = 'v20260504-4';
 
 let prodoctorCache = {};
 
@@ -2346,9 +2346,17 @@ async function carregarProducao() {
   var mesNome = agora.toLocaleString('pt-BR', {month:'long', year:'numeric'});
   try {
     var url = PRODOCOR_SCRIPT_URL + '?ano=' + ano + '&mes=' + mes + '&detalhes=1&t=' + Date.now();
-    var resp = await fetch(url);
+    // Timeout de 20 segundos
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 20000);
+    var resp = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
     var data = await resp.json();
-    if (!data || data.erro) return;
+    if (!data || data.erro) {
+      document.getElementById('prod-ranking-list').innerHTML = '<div class="prod-atualizado">⚠️ Erro ao carregar dados. <button onclick="carregarProducao()" style="font-family:inherit;font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--paper3);background:var(--white);cursor:pointer;margin-left:8px">Tentar novamente</button></div>';
+      document.getElementById('prod-hoje-list').innerHTML = '';
+      return;
+    }
     var detalhes = data.detalhes || [];
     var comparecidos = detalhes.filter(function(x){ return x.status === 'COMPARECEU'; });
     var hojeComp = comparecidos.filter(function(x){ return x.data === hoje; });
@@ -2428,8 +2436,14 @@ async function carregarProducao() {
     document.getElementById('fin-mes-sub').textContent  = fatMes.neuro + ' neuro(s) · ' + fatMes.psico + ' psicoterapia(s)';
     document.getElementById('fin-periodo').textContent  = mesNome;
   } catch(e) {
+    var isTimeout = e.name === 'AbortError';
+    var msg = isTimeout ? '⏱ Tempo esgotado — ProDoctor demorou para responder.' : '⚠️ Erro ao conectar ao ProDoctor.';
     document.getElementById('prod-hoje-num').textContent = '—';
     document.getElementById('prod-mes-num').textContent = '—';
+    document.getElementById('prod-hoje-sub').textContent = msg;
+    document.getElementById('prod-mes-sub').textContent = 'Clique em Tentar novamente';
+    document.getElementById('prod-ranking-list').innerHTML = '<div class="prod-atualizado">' + msg + ' <button onclick="carregarProducao()" style="font-family:inherit;font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--paper3);background:var(--white);cursor:pointer;margin-left:8px">🔄 Tentar novamente</button></div>';
+    document.getElementById('prod-hoje-list').innerHTML = '';
   }
 }
 

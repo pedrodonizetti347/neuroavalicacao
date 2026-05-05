@@ -311,6 +311,7 @@ tr:hover td{background:var(--paper)}
     <button onclick="showView('registros')">Registros</button>
     <button onclick="showView('atendentes')">Atendentes</button>
     <button onclick="showView('nova')">+ Nova</button>
+    <button onclick="showView('metas')">🎯 Metas</button>
     <button onclick="showView('financeiro')">💰 Financeiro</button>
     <button class="admin-only" onclick="showView('admin')">⚙ Admin</button>
   </nav>
@@ -485,6 +486,66 @@ tr:hover td{background:var(--paper)}
   </div>
 </div>
 
+<!-- METAS -->
+<div class="view" id="view-metas">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <!-- Ranking convênios -->
+    <div class="panel">
+      <div class="ph"><h2>📊 Ranking — Agendamentos do Mês</h2><span class="pill" id="metas-mes-lbl"></span></div>
+      <table style="width:100%;border-collapse:collapse" id="metas-ranking-tbody"></table>
+    </div>
+    <!-- Meta Herói -->
+    <div class="panel" style="background:linear-gradient(135deg,#0f3d26,#1a5c3a);color:#fff">
+      <div class="ph" style="border-bottom:1px solid rgba(255,255,255,.15)"><h2 style="color:#fff">🏆 Líder do Mês</h2></div>
+      <div style="padding:20px" id="metas-heroi"><div style="font-size:13px;color:rgba(255,255,255,.5)">Nenhum dado ainda.</div></div>
+    </div>
+  </div>
+  <!-- Progresso metas -->
+  <div class="panel" style="margin-bottom:14px">
+    <div class="ph"><h2>🎯 Progresso das Metas — Prevent Sênior</h2><span class="pill" id="prevent-status-badge">—</span></div>
+    <div style="padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="font-weight:600">Meta Mínima</span>
+          <span id="prog-min-nums" style="color:var(--ink3)">—</span>
+        </div>
+        <div style="height:10px;background:var(--paper2);border-radius:5px;overflow:hidden"><div id="prog-min-fill" style="height:100%;border-radius:5px;background:var(--green);transition:.4s;width:0%"></div></div>
+        <div id="prog-min-status" style="font-size:10px;font-weight:600;margin-top:4px;color:var(--amber)"></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="font-weight:600">Meta Máxima</span>
+          <span id="prog-max-nums" style="color:var(--ink3)">—</span>
+        </div>
+        <div style="height:10px;background:var(--paper2);border-radius:5px;overflow:hidden"><div id="prog-max-fill" style="height:100%;border-radius:5px;background:var(--blue);transition:.4s;width:0%"></div></div>
+        <div id="prog-max-status" style="font-size:10px;font-weight:600;margin-top:4px;color:var(--amber)"></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <div class="panel">
+      <div class="ph"><h2>🎯 Happy Vida / Notre Dame</h2><span class="pill" id="hv-badge">—</span></div>
+      <div style="padding:16px 18px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="font-weight:600">Meta</span><span id="prog-hv-nums" style="color:var(--ink3)">—</span>
+        </div>
+        <div style="height:10px;background:var(--paper2);border-radius:5px;overflow:hidden"><div id="prog-hv-fill" style="height:100%;border-radius:5px;background:#4a2472;transition:.4s;width:0%"></div></div>
+        <div id="prog-hv-status" style="font-size:10px;font-weight:600;margin-top:4px;color:var(--amber)"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>🎯 CASSI</h2><span class="pill" id="cassi-badge">—</span></div>
+      <div style="padding:16px 18px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="font-weight:600">Meta</span><span id="prog-cassi-nums" style="color:var(--ink3)">—</span>
+        </div>
+        <div style="height:10px;background:var(--paper2);border-radius:5px;overflow:hidden"><div id="prog-cassi-fill" style="height:100%;border-radius:5px;background:#0f5454;transition:.4s;width:0%"></div></div>
+        <div id="prog-cassi-status" style="font-size:10px;font-weight:600;margin-top:4px;color:var(--amber)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- FINANCEIRO -->
 <div class="view" id="view-financeiro">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
@@ -597,6 +658,7 @@ tr:hover td{background:var(--paper)}
             <th style="text-align:center">Registros</th>
             <th style="text-align:center">Atendentes</th>
             <th style="text-align:center">+ Nova</th>
+            <th style="text-align:center">🎯 Metas</th>
             <th style="text-align:center">💰 Financeiro</th>
           </tr>
         </thead>
@@ -680,12 +742,12 @@ function saveAll(){
 function defaultUsers(){
   return [
     {id:'admin',name:'Administrador',email:ADMIN_EMAIL,role:'Admin',color:'#1a5c3a',pwdHash:ADMIN_PWD_HASH,firstAccess:false,active:true},
-    {id:'milleny',name:'Milleny',email:'milleny.neuroavaliacao@gmail.com',role:'Atendente',color:'#1a5c3a',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
-    {id:'giovanna',name:'Giovanna',email:'giovanna.neuroavalicao2@gmail.com',role:'Atendente',color:'#1a3f6b',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
-    {id:'larissa',name:'Larissa',email:'',role:'Atendente',color:'#8c2020',pwdHash:'',firstAccess:true,active:false,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
-    {id:'eliana',name:'Eliana',email:'eliana08oliveira@gmail.com',role:'Atendente',color:'#7a4e00',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
-    {id:'maria',name:'Maria',email:'maria.caroline.neuroavaliacao@gmail.com',role:'Atendente',color:'#4a2472',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
-    {id:'ester',name:'Ester',email:'',role:'Atendente',color:'#0f5454',pwdHash:'',firstAccess:true,active:false,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
+    {id:'milleny',name:'Milleny',email:'milleny.neuroavaliacao@gmail.com',role:'Atendente',color:'#1a5c3a',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova','metas']},
+    {id:'giovanna',name:'Giovanna',email:'giovanna.neuroavalicao2@gmail.com',role:'Atendente',color:'#1a3f6b',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova','metas']},
+    {id:'larissa',name:'Larissa',email:'',role:'Atendente',color:'#8c2020',pwdHash:'',firstAccess:true,active:false,permissions:['dashboard','acompanhamento','registros','atendentes','nova','metas']},
+    {id:'eliana',name:'Eliana',email:'eliana08oliveira@gmail.com',role:'Atendente',color:'#7a4e00',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova','metas']},
+    {id:'maria',name:'Maria',email:'maria.caroline.neuroavaliacao@gmail.com',role:'Atendente',color:'#4a2472',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova','metas']},
+    {id:'ester',name:'Ester',email:'',role:'Atendente',color:'#0f5454',pwdHash:'',firstAccess:true,active:false,permissions:['dashboard','acompanhamento','registros','atendentes','nova','metas']},
   ];
 }
 function addLog(action,detail){
@@ -1194,8 +1256,74 @@ const PERM_VIEWS=[
   {id:'registros',label:'Registros'},
   {id:'atendentes',label:'Atendentes'},
   {id:'nova',label:'+ Nova'},
+  {id:'metas',label:'🎯 Metas'},
   {id:'financeiro',label:'💰 Financeiro'}
 ];
+const METAS_CONFIG={prevent:{min:1413,max:1570},happyvida:{meta:20},cassi:{meta:20}};
+function renderMetas(){
+  const data=monthData(curYear,curMonth);
+  const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('metas-mes-lbl').textContent=MESES[curMonth]+' '+curYear;
+  const isConv=r=>r.PLANO&&r.PLANO!=='Particular'&&r.PLANO!=='';
+  const convData=data.filter(r=>isConv(r));
+  const rankMap={};
+  convData.forEach(r=>{const at=r.ATENDENTE||r._addedBy||'?';rankMap[at]=(rankMap[at]||0)+1;});
+  const ranking=Object.entries(rankMap).sort((a,b)=>b[1]-a[1]);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('metas-ranking-tbody').innerHTML=ranking.length?ranking.map(([nome,total],i)=>{
+    const u=users.find(x=>x.name===nome)||{};
+    const cor=u.color||AT_COLORS[i%AT_COLORS.length];
+    const ini=nome.slice(0,2).toUpperCase();
+    const pct=ranking[0][1]>0?Math.round((total/ranking[0][1])*100):0;
+    return `<tr><td style="padding:10px 16px;width:40px;font-size:18px;font-weight:700">${medals[i]||((i+1)+'°')}</td>
+      <td style="padding:10px 0"><div style="width:28px;height:28px;border-radius:50%;background:${cor};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">${ini}</div></td>
+      <td style="padding:10px 12px;font-weight:600;font-size:13px">${nome}</td>
+      <td style="padding:10px 16px;text-align:right;font-size:22px;font-weight:700">${total}</td></tr>`;
+  }).join(''):'<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Nenhum agendamento de convênio neste mês.</td></tr>';
+  // Herói
+  const heroEl=document.getElementById('metas-heroi');
+  if(ranking.length>0){
+    const [heroNome,heroTotal]=ranking[0];
+    const u=users.find(x=>x.name===heroNome)||{};
+    const cor=u.color||'#1a5c3a';
+    const ini=heroNome.slice(0,2).toUpperCase();
+    heroEl.innerHTML=`<div style="display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff">${ini}</div>
+      <div><div style="font-size:16px;font-weight:700;color:#fff">${heroNome}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:2px">${heroTotal} agendamentos de convênio</div></div></div>`;
+  }else{heroEl.innerHTML='<div style="font-size:13px;color:rgba(255,255,255,.5)">Nenhum agendamento ainda.</div>';}
+  // Prevent
+  const prevTotal=data.filter(r=>isPrevent(r.PLANO||'')).length;
+  const pMin=Math.min((prevTotal/METAS_CONFIG.prevent.min)*100,100);
+  const pMax=Math.min((prevTotal/METAS_CONFIG.prevent.max)*100,100);
+  const minAt=prevTotal>=METAS_CONFIG.prevent.min,maxAt=prevTotal>=METAS_CONFIG.prevent.max;
+  document.getElementById('prog-min-nums').textContent=`${prevTotal} / ${METAS_CONFIG.prevent.min}`;
+  document.getElementById('prog-max-nums').textContent=`${prevTotal} / ${METAS_CONFIG.prevent.max}`;
+  document.getElementById('prog-min-fill').style.width=pMin+'%';
+  document.getElementById('prog-max-fill').style.width=pMax+'%';
+  document.getElementById('prog-min-status').textContent=minAt?'✅ Meta atingida!':'Faltam '+(METAS_CONFIG.prevent.min-prevTotal)+' agendamentos';
+  document.getElementById('prog-min-status').style.color=minAt?'var(--green)':'var(--amber)';
+  document.getElementById('prog-max-status').textContent=maxAt?'✅ Meta atingida!':'Faltam '+(METAS_CONFIG.prevent.max-prevTotal)+' agendamentos';
+  document.getElementById('prog-max-status').style.color=maxAt?'var(--green)':'var(--amber)';
+  const pb=document.getElementById('prevent-status-badge');
+  pb.textContent=maxAt?'✅ Meta Máxima':minAt?'✅ Meta Mínima':`${prevTotal}/${METAS_CONFIG.prevent.min}`;
+  // Notre Dame
+  const hvTotal=data.filter(r=>r.PLANO==='Notre Dame').length;
+  const hvAt=hvTotal>=METAS_CONFIG.happyvida.meta;
+  document.getElementById('prog-hv-nums').textContent=`${hvTotal} / ${METAS_CONFIG.happyvida.meta}`;
+  document.getElementById('prog-hv-fill').style.width=Math.min((hvTotal/METAS_CONFIG.happyvida.meta)*100,100)+'%';
+  document.getElementById('prog-hv-status').textContent=hvAt?'✅ Meta atingida!':'Faltam '+(METAS_CONFIG.happyvida.meta-hvTotal);
+  document.getElementById('prog-hv-status').style.color=hvAt?'#4a2472':'var(--amber)';
+  document.getElementById('hv-badge').textContent=hvAt?'✅ Atingida':`${hvTotal}/${METAS_CONFIG.happyvida.meta}`;
+  // CASSI
+  const cassiTotal=data.filter(r=>r.PLANO==='CASSI').length;
+  const cassiAt=cassiTotal>=METAS_CONFIG.cassi.meta;
+  document.getElementById('prog-cassi-nums').textContent=`${cassiTotal} / ${METAS_CONFIG.cassi.meta}`;
+  document.getElementById('prog-cassi-fill').style.width=Math.min((cassiTotal/METAS_CONFIG.cassi.meta)*100,100)+'%';
+  document.getElementById('prog-cassi-status').textContent=cassiAt?'✅ Meta atingida!':'Faltam '+(METAS_CONFIG.cassi.meta-cassiTotal);
+  document.getElementById('prog-cassi-status').style.color=cassiAt?'#0f5454':'var(--amber)';
+  document.getElementById('cassi-badge').textContent=cassiAt?'✅ Atingida':`${cassiTotal}/${METAS_CONFIG.cassi.meta}`;
+}
 const PRECO={'Avaliação Neuropsicológica':150,'1ª CONSULTA':150,'Devolutiva':150,'Testagem':150,'Psicoterapia':40};
 const PRODOCOR_SCRIPT_URL='https://script.google.com/macros/s/AKfycbyFjC5joHY6rVZ3mG1OvREuiO3zlh75q8LhhhQ5s2boDOb6CNC1IqFgsGq9L4ttQApU/exec';
 const COD_PSICOTERAPIA='50000470';
@@ -1428,7 +1556,7 @@ function addUser(){
   if(!pwd||pwd.length<6){toast('Senha provisória: mínimo 6 caracteres.','error');return;}
   if(users.find(u=>u.email.toLowerCase()===email)){toast('Este email já está cadastrado.','error');return;}
   const id=nome.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();
-  users.push({id,name:nome,email,role,color:cor,pwdHash:hashPwd(pwd),firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']});
+  users.push({id,name:nome,email,role,color:cor,pwdHash:hashPwd(pwd),firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova','metas']});
   addLog('Novo usuário',`${nome} (${email}) adicionado como ${role}`);saveAll();
   document.getElementById('nu-nome').value='';document.getElementById('nu-email').value='';document.getElementById('nu-pwd').value='';
   document.getElementById('add-user-panel').style.display='none';
@@ -1521,11 +1649,12 @@ function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.querySelectorAll('.h-nav button').forEach(b=>b.classList.remove('active'));
-  const map={dashboard:0,acompanhamento:1,registros:2,atendentes:3,nova:4,financeiro:5,admin:6};
+  const map={dashboard:0,acompanhamento:1,registros:2,atendentes:3,nova:4,metas:5,financeiro:6,admin:7};
   const btns=document.querySelectorAll('.h-nav button');if(btns[map[v]])btns[map[v]].classList.add('active');
   if(v==='atendentes')renderAtendentes(monthData(curYear,curMonth));
   if(v==='admin')renderAdmin();
   if(v==='financeiro')renderFinanceiro();
+  if(v==='metas')renderMetas();
   if(v==='registros')renderFinResumo();
 }
 function toast(msg,type='success'){

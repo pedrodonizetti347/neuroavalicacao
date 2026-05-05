@@ -3,6 +3,9 @@
 <html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Neuroavaliação — Controle de Agendamentos</title>
 <link href="./Neuroavaliação — Controle de Agendamentos_files/css2" rel="stylesheet">
 <script src="./Neuroavaliação — Controle de Agendamentos_files/jspdf.umd.min.js.download"></script>
@@ -403,6 +406,7 @@ tr:hover td{background:var(--paper)}
     <div class="user-av" id="h-av" style="background:#1a5c3a">AD</div>
     <div><div class="user-name-h" id="h-name">Administrador</div><div class="user-role-h" id="h-role">Admin</div></div>
     <button class="h-logout" onclick="syncFromSheets(true)" title="Atualizar dados" style="margin-right:4px">🔄</button><button class="h-logout" onclick="doLogout()">Sair</button>
+    <span id="build-badge" style="font-size:9px;color:rgba(255,255,255,.25);margin-left:8px">v20260504-2</span>
   </div>
 </header>
 
@@ -1830,6 +1834,7 @@ function toast(msg,type='success'){
 // INTEGRAÇÃO PRODOCOR
 // ═══════════════════════════════════════════════════════════
 const PRODOCOR_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFjC5joHY6rVZ3mG1OvREuiO3zlh75q8LhhhQ5s2boDOb6CNC1IqFgsGq9L4ttQApU/exec';
+const BUILD_VERSION = 'v20260504-2';
 
 let prodoctorCache = {};
 
@@ -2397,7 +2402,7 @@ async function carregarProducao() {
             +'<div class="prod-rank-tipo">'+(x.paciente||'—')+'</div></div>'+badge+'</div>';
         }).join('');
 
-    document.getElementById('prod-footer').textContent = '⏱ Atualizado ' + agora.toLocaleTimeString('pt-BR') + ' · Atualiza a cada 5 min';
+    document.getElementById('prod-footer').textContent = '⏱ Atualizado ' + agora.toLocaleTimeString('pt-BR') + ' · Atualiza a cada 5 min · ' + BUILD_VERSION;
 
     // ── PAINEL FINANCEIRO ──────────────────────────────────────
     var VALOR_NEURO = 150;

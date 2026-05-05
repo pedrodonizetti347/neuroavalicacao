@@ -1153,7 +1153,7 @@ const PERM_VIEWS=[
   {id:'nova',label:'+ Nova'},
   {id:'financeiro',label:'💰 Financeiro'}
 ];
-const PRECO={'Avaliação Neuropsicológica':150,'Psicoterapia':40,'1ª CONSULTA':150};
+const PRECO={'Avaliação Neuropsicológica':150,'Psicoterapia':40};
 const PLANOS_FIN=['prevent','prevent sênior','prevent senior'];
 function isPrevent(plano){return PLANOS_FIN.some(p=>plano.toLowerCase().includes(p));}
 function renderFinanceiro(){
@@ -1161,13 +1161,13 @@ function renderFinanceiro(){
   const mesData=monthData(curYear,curMonth).filter(r=>isPrevent(r.PLANO||''));
   const hojeData=mesData.filter(r=>r.DATA===todayStr);
   // Hoje
-  const hojeAval=hojeData.filter(r=>r.PROCEDIMENTO==='Avaliação Neuropsicológica'||r.PROCEDIMENTO==='1ª CONSULTA').length;
+  const hojeAval=hojeData.filter(r=>r.PROCEDIMENTO==='Avaliação Neuropsicológica').length;
   const hojePsico=hojeData.filter(r=>r.PROCEDIMENTO==='Psicoterapia').length;
   const hojeTotal=hojeAval*150+hojePsico*40;
   document.getElementById('fin-hoje').textContent='R$ '+hojeTotal.toFixed(2).replace('.',',');
   document.getElementById('fin-hoje-det').textContent=`${hojeAval} avaliação(ões) · ${hojePsico} psicoterapia(s)`;
   // Mês
-  const mesAval=mesData.filter(r=>r.PROCEDIMENTO==='Avaliação Neuropsicológica'||r.PROCEDIMENTO==='1ª CONSULTA').length;
+  const mesAval=mesData.filter(r=>r.PROCEDIMENTO==='Avaliação Neuropsicológica').length;
   const mesPsico=mesData.filter(r=>r.PROCEDIMENTO==='Psicoterapia').length;
   const mesTotal=mesAval*150+mesPsico*40;
   const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -1178,7 +1178,7 @@ function renderFinanceiro(){
   const porDia={};
   mesData.forEach(r=>{
     if(!porDia[r.DATA])porDia[r.DATA]={aval:0,psico:0};
-    if(r.PROCEDIMENTO==='Avaliação Neuropsicológica'||r.PROCEDIMENTO==='1ª CONSULTA')porDia[r.DATA].aval++;
+    if(r.PROCEDIMENTO==='Avaliação Neuropsicológica')porDia[r.DATA].aval++;
     else if(r.PROCEDIMENTO==='Psicoterapia')porDia[r.DATA].psico++;
   });
   const dias=Object.keys(porDia).sort();

@@ -505,6 +505,25 @@ tr:hover td{background:var(--paper)}
       <button class="btn" onclick="document.getElementById('add-user-panel').style.display='none'">Cancelar</button>
     </div>
   </div>
+  <!-- Permissões -->
+  <div class="panel" style="margin-bottom:14px">
+    <div class="ph"><h2>🔐 Permissões por usuária</h2><span class="pill">O que cada uma pode ver</span></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Usuária</th>
+            <th style="text-align:center">Dashboard</th>
+            <th style="text-align:center">Acompanhamento</th>
+            <th style="text-align:center">Registros</th>
+            <th style="text-align:center">Atendentes</th>
+            <th style="text-align:center">+ Nova</th>
+          </tr>
+        </thead>
+        <tbody id="perm-body"></tbody>
+      </table>
+    </div>
+  </div>
   <!-- Log -->
   <div class="panel">
     <div class="ph"><h2>Log de atividades</h2><span class="pill" id="log-count"></span></div>
@@ -559,6 +578,8 @@ function loadAll(){
   // Users
   try{const r=localStorage.getItem(SK_USERS);if(r)users=JSON.parse(r);}catch(e){users=[];}
   if(!users.length) users=defaultUsers();
+  // Migração: garantir que todos os não-admin tenham permissions
+  users.forEach(u=>{if(u.role!=='Admin'&&!u.permissions)u.permissions=['dashboard','acompanhamento','registros','atendentes','nova'];});
   // Always force-sync admin from hardcoded config (can't be overridden by cache)
   const _ai=users.findIndex(u=>u.id==='admin');
   if(_ai>-1){users[_ai].pwdHash=ADMIN_PWD_HASH;users[_ai].email=ADMIN_EMAIL;users[_ai].firstAccess=false;users[_ai].active=true;}
@@ -579,12 +600,12 @@ function saveAll(){
 function defaultUsers(){
   return [
     {id:'admin',name:'Administrador',email:ADMIN_EMAIL,role:'Admin',color:'#1a5c3a',pwdHash:ADMIN_PWD_HASH,firstAccess:false,active:true},
-    {id:'milleny',name:'Milleny',email:'milleny.neuroavaliacao@gmail.com',role:'Atendente',color:'#1a5c3a',pwdHash:'',firstAccess:true,active:true},
-    {id:'giovanna',name:'Giovanna',email:'giovanna.neuroavalicao2@gmail.com',role:'Atendente',color:'#1a3f6b',pwdHash:'',firstAccess:true,active:true},
-    {id:'larissa',name:'Larissa',email:'',role:'Atendente',color:'#8c2020',pwdHash:'',firstAccess:true,active:false},
-    {id:'eliana',name:'Eliana',email:'eliana08oliveira@gmail.com',role:'Atendente',color:'#7a4e00',pwdHash:'',firstAccess:true,active:true},
-    {id:'maria',name:'Maria',email:'maria.caroline.neuroavaliacao@gmail.com',role:'Atendente',color:'#4a2472',pwdHash:'',firstAccess:true,active:true},
-    {id:'ester',name:'Ester',email:'',role:'Atendente',color:'#0f5454',pwdHash:'',firstAccess:true,active:false},
+    {id:'milleny',name:'Milleny',email:'milleny.neuroavaliacao@gmail.com',role:'Atendente',color:'#1a5c3a',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
+    {id:'giovanna',name:'Giovanna',email:'giovanna.neuroavalicao2@gmail.com',role:'Atendente',color:'#1a3f6b',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
+    {id:'larissa',name:'Larissa',email:'',role:'Atendente',color:'#8c2020',pwdHash:'',firstAccess:true,active:false,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
+    {id:'eliana',name:'Eliana',email:'eliana08oliveira@gmail.com',role:'Atendente',color:'#7a4e00',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
+    {id:'maria',name:'Maria',email:'maria.caroline.neuroavaliacao@gmail.com',role:'Atendente',color:'#4a2472',pwdHash:'',firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
+    {id:'ester',name:'Ester',email:'',role:'Atendente',color:'#0f5454',pwdHash:'',firstAccess:true,active:false,permissions:['dashboard','acompanhamento','registros','atendentes','nova']},
   ];
 }
 function addLog(action,detail){
@@ -667,6 +688,7 @@ function enterApp(u){
   document.getElementById('h-name').textContent=u.name;
   document.getElementById('h-role').textContent=u.role;
   if(u.role==='Admin')document.body.classList.add('admin-mode');
+  applyPermissions(u);
   document.getElementById('del-col-h').textContent=u.role==='Admin'?'':'';
   populateAtSelect();
   addLog('Login',`${u.name} (${u.email}) entrou`);
@@ -683,6 +705,7 @@ function doLogout(){
   addLog('Logout',`${curUser?.name} saiu`);
   curUser=null;
   document.body.classList.remove('admin-mode');
+  document.querySelectorAll('.h-nav button:not(.admin-only)').forEach(b=>b.style.display='');
   document.getElementById('app').style.display='none';
   document.getElementById('l-email').value='';
   document.getElementById('l-senha').value='';
@@ -1076,11 +1099,49 @@ function renderAdmin(){
       <div style="font-size:10px;color:var(--ink3);margin-top:6px">Repasse este código APENAS para ${r.userName} pelo WhatsApp ou pessoalmente. Válido por 24h.</div>
     </div>`).join('')
     :'<p style="font-size:12px;color:var(--ink3)">Nenhuma solicitação pendente.</p>';
+  // Permissões
+  renderPermissions();
   // Log
   document.getElementById('log-count').textContent=actLog.length;
   document.getElementById('log-tbody').innerHTML=[...actLog].reverse().slice(0,80).map(l=>
     `<tr><td style="font-size:11px;color:var(--ink3);white-space:nowrap">${l.ts}</td><td style="font-weight:500">${l.user}</td><td>${l.action}</td><td style="color:var(--ink3)">${l.detail}</td></tr>`
   ).join('');
+}
+
+const PERM_VIEWS=[
+  {id:'dashboard',label:'Dashboard'},
+  {id:'acompanhamento',label:'Acompanhamento'},
+  {id:'registros',label:'Registros'},
+  {id:'atendentes',label:'Atendentes'},
+  {id:'nova',label:'+ Nova'}
+];
+function applyPermissions(u){
+  const btns=document.querySelectorAll('.h-nav button:not(.admin-only)');
+  if(u.role==='Admin'){btns.forEach(b=>b.style.display='');return;}
+  const perms=u.permissions||PERM_VIEWS.map(v=>v.id);
+  PERM_VIEWS.forEach((v,i)=>{if(btns[i])btns[i].style.display=perms.includes(v.id)?'':'none';});
+}
+function renderPermissions(){
+  const el=document.getElementById('perm-body');if(!el)return;
+  const ativos=users.filter(u=>u.role!=='Admin'&&u.active);
+  el.innerHTML=ativos.map(u=>{
+    const perms=u.permissions||PERM_VIEWS.map(v=>v.id);
+    return `<tr>
+      <td style="font-weight:600;padding:10px 12px;white-space:nowrap">${u.name}</td>
+      ${PERM_VIEWS.map(v=>`<td style="text-align:center;padding:10px 12px">
+        <input type="checkbox" ${perms.includes(v.id)?'checked':''} onchange="togglePermission('${u.id}','${v.id}',this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#1a5c3a">
+      </td>`).join('')}
+    </tr>`;
+  }).join('')||'<tr><td colspan="6" style="padding:14px;color:var(--ink3);font-size:12px">Nenhuma usuária ativa.</td></tr>';
+}
+function togglePermission(uid,view,checked){
+  const u=users.find(x=>x.id===uid);if(!u)return;
+  if(!u.permissions)u.permissions=PERM_VIEWS.map(v=>v.id);
+  if(checked&&!u.permissions.includes(view))u.permissions.push(view);
+  if(!checked)u.permissions=u.permissions.filter(v=>v!==view);
+  saveAll();
+  addLog('Permissão',`${u.name}: "${view}" ${checked?'liberado':'bloqueado'}`);
+  toast(`${u.name}: "${view}" ${checked?'liberado ✓':'bloqueado'}!`,'success');
 }
 
 function showAddUser(){document.getElementById('add-user-panel').style.display='block';}
@@ -1094,7 +1155,7 @@ function addUser(){
   if(!pwd||pwd.length<6){toast('Senha provisória: mínimo 6 caracteres.','error');return;}
   if(users.find(u=>u.email.toLowerCase()===email)){toast('Este email já está cadastrado.','error');return;}
   const id=nome.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();
-  users.push({id,name:nome,email,role,color:cor,pwdHash:hashPwd(pwd),firstAccess:true,active:true});
+  users.push({id,name:nome,email,role,color:cor,pwdHash:hashPwd(pwd),firstAccess:true,active:true,permissions:['dashboard','acompanhamento','registros','atendentes','nova']});
   addLog('Novo usuário',`${nome} (${email}) adicionado como ${role}`);saveAll();
   document.getElementById('nu-nome').value='';document.getElementById('nu-email').value='';document.getElementById('nu-pwd').value='';
   document.getElementById('add-user-panel').style.display='none';
@@ -1180,6 +1241,10 @@ function exportPDF(type){
 // NAV + UTILS
 // ═══════════════════════════════════════════════════════════
 function showView(v){
+  if(v!=='admin'&&curUser&&curUser.role!=='Admin'){
+    const perms=curUser.permissions||['dashboard','acompanhamento','registros','atendentes','nova'];
+    if(!perms.includes(v)){showView('dashboard');return;}
+  }
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.querySelectorAll('.h-nav button').forEach(b=>b.classList.remove('active'));

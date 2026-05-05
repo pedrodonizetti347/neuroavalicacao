@@ -433,16 +433,18 @@ tr:hover td{background:var(--paper)}
   </div>
   <!-- Resumo financeiro Prevent -->
   <div class="panel" id="fin-resumo-reg" style="margin-top:14px;display:none">
-    <div class="ph"><h2>💰 Faturamento Prevent / Prevent Sênior</h2></div>
+    <div class="ph"><h2>💰 Faturamento Prevent / Prevent Sênior</h2>
+      <button onclick="buscarRelatorio()" style="margin-left:auto;font-family:inherit;font-size:12px;font-weight:600;padding:6px 14px;background:#1a5c3a;color:#fff;border:none;border-radius:8px;cursor:pointer">🔍 Atualizar ProDoctor</button>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--paper3)">
       <div style="padding:16px 20px;border-right:1px solid var(--paper3)">
-        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Hoje</div>
-        <div id="reg-fin-hoje" style="font-size:26px;font-weight:700;color:#1a5c3a">R$ 0,00</div>
-        <div id="reg-fin-hoje-det" style="font-size:11px;color:var(--ink3);margin-top:2px"></div>
+        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Hoje — só compareceram</div>
+        <div id="reg-fin-hoje" style="font-size:26px;font-weight:700;color:#1a5c3a">—</div>
+        <div id="reg-fin-hoje-det" style="font-size:11px;color:var(--ink3);margin-top:2px">Clique em Atualizar ProDoctor</div>
       </div>
       <div style="padding:16px 20px">
-        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px" id="reg-fin-mes-label">Mês</div>
-        <div id="reg-fin-mes" style="font-size:26px;font-weight:700;color:#1a3f6b">R$ 0,00</div>
+        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px" id="reg-fin-mes-label">Mês — só compareceram</div>
+        <div id="reg-fin-mes" style="font-size:26px;font-weight:700;color:#1a3f6b">—</div>
         <div id="reg-fin-mes-det" style="font-size:11px;color:var(--ink3);margin-top:2px"></div>
       </div>
     </div>
@@ -1401,22 +1403,8 @@ function renderFinResumo(){
   if(!el)return;
   el.style.display=temPerm?'block':'none';
   if(!temPerm)return;
-  const todayStr=new Date().toISOString().slice(0,10);
-  const mesData=monthData(curYear,curMonth).filter(r=>isPrevent(r.PLANO||''));
-  const hojeData=mesData.filter(r=>r.DATA===todayStr);
-  const calcTotal=arr=>arr.reduce((s,r)=>s+(PRECO[r.PROCEDIMENTO]||0),0);
-  const hojeTotal=calcTotal(hojeData);
-  const mesTotal=calcTotal(mesData);
-  const hojePsico=hojeData.filter(r=>r.PROCEDIMENTO==='Psicoterapia').length;
-  const hojeAval=hojeData.filter(r=>PRECO[r.PROCEDIMENTO]&&r.PROCEDIMENTO!=='Psicoterapia').length;
-  const mesPsico=mesData.filter(r=>r.PROCEDIMENTO==='Psicoterapia').length;
-  const mesAval=mesData.filter(r=>PRECO[r.PROCEDIMENTO]&&r.PROCEDIMENTO!=='Psicoterapia').length;
   const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  document.getElementById('reg-fin-hoje').textContent='R$ '+hojeTotal.toFixed(2).replace('.',',');
-  document.getElementById('reg-fin-hoje-det').textContent=`${hojeAval} aval. · ${hojePsico} psicoterapia(s)`;
-  document.getElementById('reg-fin-mes-label').textContent=MESES[curMonth]+' '+curYear;
-  document.getElementById('reg-fin-mes').textContent='R$ '+mesTotal.toFixed(2).replace('.',',');
-  document.getElementById('reg-fin-mes-det').textContent=`${mesAval} aval. · ${mesPsico} psicoterapia(s)`;
+  document.getElementById('reg-fin-mes-label').textContent=MESES[curMonth]+' '+curYear+' — só compareceram';
 }
 function togglePermission(uid,view,checked){
   const u=users.find(x=>x.id===uid);if(!u)return;

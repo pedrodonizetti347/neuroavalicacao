@@ -431,6 +431,22 @@ tr:hover td{background:var(--paper)}
       <span class="pgi" id="pg-info"></span>
     </div>
   </div>
+  <!-- Resumo financeiro Prevent -->
+  <div class="panel" id="fin-resumo-reg" style="margin-top:14px;display:none">
+    <div class="ph"><h2>💰 Faturamento Prevent / Prevent Sênior</h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--paper3)">
+      <div style="padding:16px 20px;border-right:1px solid var(--paper3)">
+        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Hoje</div>
+        <div id="reg-fin-hoje" style="font-size:26px;font-weight:700;color:#1a5c3a">R$ 0,00</div>
+        <div id="reg-fin-hoje-det" style="font-size:11px;color:var(--ink3);margin-top:2px"></div>
+      </div>
+      <div style="padding:16px 20px">
+        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px" id="reg-fin-mes-label">Mês</div>
+        <div id="reg-fin-mes" style="font-size:26px;font-weight:700;color:#1a3f6b">R$ 0,00</div>
+        <div id="reg-fin-mes-det" style="font-size:11px;color:var(--ink3);margin-top:2px"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ATENDENTES -->
@@ -455,7 +471,7 @@ tr:hover td{background:var(--paper)}
       <div class="fg full"><label>Nome do paciente</label><input type="text" id="f-nome" placeholder="Nome completo"></div>
       <div class="fg"><label>Plano</label><select id="f-plano"><option value="">Selecione...</option><option>Prevent</option><option>CASSI</option><option>Notre Dame</option><option>Particular</option><option>CABESP</option><option>AMIL</option><option>IAMSPE</option></select></div>
       <div class="fg"><label>Carteirinha</label><input type="text" id="f-cart" placeholder="Número"></div>
-      <div class="fg"><label>Procedimento</label><select id="f-proc"><option value="Avaliação Neuropsicológica">Avaliação Neuropsicológica</option><option value="Psicoterapia">Psicoterapia</option><option value="Retorno">Retorno</option><option value="Outro">Outro</option></select></div>
+      <div class="fg"><label>Procedimento</label><select id="f-proc"><option value="1ª CONSULTA">1ª Consulta</option><option value="Devolutiva">Devolutiva</option><option value="Testagem">Testagem</option><option value="Psicoterapia">Psicoterapia</option><option value="Avaliação Neuropsicológica">Avaliação Neuropsicológica</option><option value="Retorno">Retorno</option><option value="Outro">Outro</option></select></div>
       <div class="fg"><label>Tem SADT?</label><select id="f-sadt"><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select></div>
       <div class="fg"><label>Telefone</label><input type="text" id="f-tel" placeholder="(11) 99999-9999"></div>
       <div class="fg"><label>Como nos achou</label><select id="f-orig"><option value="Convênio">Convênio</option><option value="Google">Google</option><option value="Instagram">Instagram</option><option value="Reagendamento">Reagendamento</option><option value="Indicação">Indicação</option><option value="Outro">Outro</option></select></div>
@@ -1153,7 +1169,7 @@ const PERM_VIEWS=[
   {id:'nova',label:'+ Nova'},
   {id:'financeiro',label:'💰 Financeiro'}
 ];
-const PRECO={'Avaliação Neuropsicológica':150,'Psicoterapia':40};
+const PRECO={'Avaliação Neuropsicológica':150,'1ª CONSULTA':150,'Devolutiva':150,'Testagem':150,'Psicoterapia':40};
 const PLANOS_FIN=['prevent','prevent sênior','prevent senior'];
 function isPrevent(plano){return PLANOS_FIN.some(p=>plano.toLowerCase().includes(p));}
 function renderFinanceiro(){
@@ -1161,15 +1177,16 @@ function renderFinanceiro(){
   const mesData=monthData(curYear,curMonth).filter(r=>isPrevent(r.PLANO||''));
   const hojeData=mesData.filter(r=>r.DATA===todayStr);
   // Hoje
-  const hojeAval=hojeData.filter(r=>r.PROCEDIMENTO==='Avaliação Neuropsicológica').length;
+  const calcTotal=arr=>arr.reduce((s,r)=>s+(PRECO[r.PROCEDIMENTO]||0),0);
+  const hojeTotal=calcTotal(hojeData);
   const hojePsico=hojeData.filter(r=>r.PROCEDIMENTO==='Psicoterapia').length;
-  const hojeTotal=hojeAval*150+hojePsico*40;
+  const hojeAval=hojeData.filter(r=>PRECO[r.PROCEDIMENTO]&&r.PROCEDIMENTO!=='Psicoterapia').length;
   document.getElementById('fin-hoje').textContent='R$ '+hojeTotal.toFixed(2).replace('.',',');
   document.getElementById('fin-hoje-det').textContent=`${hojeAval} avaliação(ões) · ${hojePsico} psicoterapia(s)`;
   // Mês
-  const mesAval=mesData.filter(r=>r.PROCEDIMENTO==='Avaliação Neuropsicológica').length;
+  const mesTotal=calcTotal(mesData);
   const mesPsico=mesData.filter(r=>r.PROCEDIMENTO==='Psicoterapia').length;
-  const mesTotal=mesAval*150+mesPsico*40;
+  const mesAval=mesData.filter(r=>PRECO[r.PROCEDIMENTO]&&r.PROCEDIMENTO!=='Psicoterapia').length;
   const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   document.getElementById('fin-mes-label').textContent=MESES[curMonth]+' '+curYear;
   document.getElementById('fin-mes').textContent='R$ '+mesTotal.toFixed(2).replace('.',',');
@@ -1178,8 +1195,8 @@ function renderFinanceiro(){
   const porDia={};
   mesData.forEach(r=>{
     if(!porDia[r.DATA])porDia[r.DATA]={aval:0,psico:0};
-    if(r.PROCEDIMENTO==='Avaliação Neuropsicológica')porDia[r.DATA].aval++;
-    else if(r.PROCEDIMENTO==='Psicoterapia')porDia[r.DATA].psico++;
+    if(r.PROCEDIMENTO==='Psicoterapia')porDia[r.DATA].psico++;
+    else if(PRECO[r.PROCEDIMENTO])porDia[r.DATA].aval++;
   });
   const dias=Object.keys(porDia).sort();
   document.getElementById('fin-tbody').innerHTML=dias.length?dias.map(d=>{
@@ -1215,6 +1232,29 @@ function renderPermissions(){
       </td>`).join('')}
     </tr>`;
   }).join('')||'<tr><td colspan="6" style="padding:14px;color:var(--ink3);font-size:12px">Nenhuma usuária ativa.</td></tr>';
+}
+function renderFinResumo(){
+  const temPerm=curUser&&(curUser.role==='Admin'||(curUser.permissions||[]).includes('financeiro'));
+  const el=document.getElementById('fin-resumo-reg');
+  if(!el)return;
+  el.style.display=temPerm?'block':'none';
+  if(!temPerm)return;
+  const todayStr=new Date().toISOString().slice(0,10);
+  const mesData=monthData(curYear,curMonth).filter(r=>isPrevent(r.PLANO||''));
+  const hojeData=mesData.filter(r=>r.DATA===todayStr);
+  const calcTotal=arr=>arr.reduce((s,r)=>s+(PRECO[r.PROCEDIMENTO]||0),0);
+  const hojeTotal=calcTotal(hojeData);
+  const mesTotal=calcTotal(mesData);
+  const hojePsico=hojeData.filter(r=>r.PROCEDIMENTO==='Psicoterapia').length;
+  const hojeAval=hojeData.filter(r=>PRECO[r.PROCEDIMENTO]&&r.PROCEDIMENTO!=='Psicoterapia').length;
+  const mesPsico=mesData.filter(r=>r.PROCEDIMENTO==='Psicoterapia').length;
+  const mesAval=mesData.filter(r=>PRECO[r.PROCEDIMENTO]&&r.PROCEDIMENTO!=='Psicoterapia').length;
+  const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('reg-fin-hoje').textContent='R$ '+hojeTotal.toFixed(2).replace('.',',');
+  document.getElementById('reg-fin-hoje-det').textContent=`${hojeAval} aval. · ${hojePsico} psicoterapia(s)`;
+  document.getElementById('reg-fin-mes-label').textContent=MESES[curMonth]+' '+curYear;
+  document.getElementById('reg-fin-mes').textContent='R$ '+mesTotal.toFixed(2).replace('.',',');
+  document.getElementById('reg-fin-mes-det').textContent=`${mesAval} aval. · ${mesPsico} psicoterapia(s)`;
 }
 function togglePermission(uid,view,checked){
   const u=users.find(x=>x.id===uid);if(!u)return;
@@ -1335,6 +1375,7 @@ function showView(v){
   if(v==='atendentes')renderAtendentes(monthData(curYear,curMonth));
   if(v==='admin')renderAdmin();
   if(v==='financeiro')renderFinanceiro();
+  if(v==='registros')renderFinResumo();
 }
 function toast(msg,type='success'){
   const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.classList.add('show');
